@@ -1083,6 +1083,19 @@ QGCView {
                 }
 
 
+                // Added a Button to load a kml file for obstacles 11.12.2018
+                //no functionality added so far, does exactly the same as "Load KML ... "
+                QGCButton {
+                    text:               qsTr("Load KML Obstacles")
+                    Layout.fillWidth:   true
+                    enabled:            !masterController.syncInProgress
+                    onClicked: {
+                        dropPanel.hide()
+                       masterController.loadKmlFromSelectedFile()
+                    }
+                }
+
+
                 QGCButton {
                     text:               qsTr("Save KML...")
                     Layout.fillWidth:   true

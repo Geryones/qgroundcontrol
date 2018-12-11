@@ -369,19 +369,26 @@ void TransectStyleComplexItem::_rebuildTransects(void)
     double west  = 360.0;
     double bottom = 100000.;
     double top = 0.;
+/*
+ * DAs hier könnte das Pathing sein...
+*/
     // Generate the visuals transect representation
+    int i = 0;
     _visualTransectPoints.clear();
     foreach (const QList<CoordInfo_t>& transect, _transects) {
         foreach (const CoordInfo_t& coordInfo, transect) {
             _visualTransectPoints.append(QVariant::fromValue(coordInfo.coord));
             double lat = coordInfo.coord.latitude()  + 90.0;
             double lon = coordInfo.coord.longitude() + 180.0;
+            qDebug("%d round", i);
+            i++;
             north   = fmax(north, lat);
             south   = fmin(south, lat);
             east    = fmax(east,  lon);
             west    = fmin(west,  lon);
             bottom  = fmin(bottom, coordInfo.coord.altitude());
             top     = fmax(top, coordInfo.coord.altitude());
+
         }
     }
     //-- Update bounding cube for airspace management control
