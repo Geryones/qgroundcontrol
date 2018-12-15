@@ -25,7 +25,8 @@ public:
         Polygon,
         Polyline,
         //Mixed for file with mixed forms (points, polygon, polylines)
-        Mixed,
+        // Mixed,
+        //Point,
         Error
     };
     Q_ENUM(KMLFileContents)
