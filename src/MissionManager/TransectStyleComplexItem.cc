@@ -370,7 +370,7 @@ void TransectStyleComplexItem::_rebuildTransects(void)
     double bottom = 100000.;
     double top = 0.;
 /*
- * DAs hier könnte das Pathing sein...
+ * Das hier könnte das Pathing sein...
 */
     // Generate the visuals transect representation
     int i = 0;
@@ -380,7 +380,7 @@ void TransectStyleComplexItem::_rebuildTransects(void)
             _visualTransectPoints.append(QVariant::fromValue(coordInfo.coord));
             double lat = coordInfo.coord.latitude()  + 90.0;
             double lon = coordInfo.coord.longitude() + 180.0;
-            qDebug("%d round", i);
+            qDebug("%d round in TransectStyleComplexItem.cc line 384", i);
             i++;
             north   = fmax(north, lat);
             south   = fmin(south, lat);

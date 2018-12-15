@@ -85,8 +85,11 @@ KMLFileHelper::KMLFileContents KMLFileHelper::determineFileContents(const QStrin
     QDomNodeList pointNodes     =  domDocument.elementsByTagName("Point");
     QDomNodeList multiNodes     =  domDocument.elementsByTagName("MultiGeometry");
 
-    qDebug("Count for all : Polygons: %d , Lines: %d , Points: %d , Multigeometry: %d",
+    qDebug("Count for all : Polygons: %d , Lines: %d , Points: %d , Multigeometry: %d KMLFileHelper.cc Line 88",
            polygonNodes.count(),lineNodes.count(),pointNodes.count(), multiNodes.count());
+    //After this step i have to choose if its a survey or a structrue scan... If i import obstacles this step is unnecessary
+    //gotta see how i can skip this
+
     /*
     if (polygonNodes.count() && lineNodes.count()){
         return Mixed;
@@ -108,6 +111,8 @@ KMLFileHelper::KMLFileContents KMLFileHelper::determineFileContents(const QStrin
     errorString = tr("No known type found in KML file.");
     return Error;
 }
+
+
 // After clicking Survey and OK i go there, to create a polygon from file
 //have to find out how to do this multiple times
 bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordinate>& vertices, QString& errorString)

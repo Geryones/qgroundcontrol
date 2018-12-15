@@ -245,7 +245,13 @@ QGCView {
         function fitViewportToItems() {
             mapFitFunctions.fitMapViewportToMissionItems()
         }
-
+        /*
+          15.12.2018 Jurij
+          this function is to load the kml file.. it is called after we select Load kml or my option
+          load kml obstacles...
+          i think here it should split from the load kml... -path, if load kml obstacles was selected
+          sadly i dont understand what happens now
+        */
         function loadKmlFromSelectedFile() {
             fileDialog.title =          qsTr("Load KML")
             fileDialog.planFiles =      false
@@ -349,6 +355,12 @@ QGCView {
         }
     }
 
+    /*
+      15.12.2018 Jurij
+      this selection is not nessecarry when i load obstacles.. have to find a way around it
+      because obstacles are mostlikley no mission items and do not recuire anykind of flightpatterns
+    */
+
     property string kmlPolygonSelectDialogKMLFile
     Component {
         id: kmlPolygonSelectDialog
@@ -357,8 +369,9 @@ QGCView {
             function accept() {
                 var complexItemName
                 if (surveyRadio.checked) {
+                    //those names are defined in MissionController.h Line 98
                     complexItemName = _missionController.surveyComplexItemName
-                } else {
+                } else{
                     complexItemName = _missionController.structureScanComplexItemName
                 }
                 insertComplexMissionItemFromKML(complexItemName, kmlPolygonSelectDialogKMLFile, -1)
