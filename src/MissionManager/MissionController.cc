@@ -435,7 +435,8 @@ int MissionController::insertComplexMissionItem(QString itemName, QGeoCoordinate
 int MissionController::insertComplexMissionItemFromKML(QString itemName, QString kmlFile, int i)
 {
     ComplexMissionItem* newItem;
-    qDebug("After i choose survey i land here");
+    qDebug("After the polygon is created I land here, MissionController.cc line 438");
+    //maybe a new class Obstacles which implements geometry to create all the polygons, lines and points?
     if (itemName == _surveyMissionItemName) {
         newItem = new SurveyComplexItem(_controllerVehicle, _flyView, kmlFile, _visualItems);
     } else if (itemName == _structureScanMissionItemName) {

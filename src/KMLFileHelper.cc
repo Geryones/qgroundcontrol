@@ -108,10 +108,13 @@ KMLFileHelper::KMLFileContents KMLFileHelper::determineFileContents(const QStrin
     errorString = tr("No known type found in KML file.");
     return Error;
 }
-
+// After clicking Survey and OK i go there, to create a polygon from file
+//have to find out how to do this multiple times
 bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordinate>& vertices, QString& errorString)
 {
+    qDebug("Creation of Polygons happens here, KMLFileHelper Line 115");
     errorString.clear();
+    //vertices.clear() takes very long.. wonder why
     vertices.clear();
 
     QDomDocument domDocument = KMLFileHelper::loadFile(kmlFile, errorString);
@@ -124,7 +127,7 @@ bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordi
         errorString = tr("Unable to find Polygon node in KML");
         return false;
     }
-
+    //Maybe with a foreach here? foreach(rgNodes.item ) ?
     QDomNode coordinatesNode = rgNodes.item(0).namedItem("outerBoundaryIs").namedItem("LinearRing").namedItem("coordinates");
     if (coordinatesNode.isNull()) {
         errorString = tr("Internal error: Unable to find coordinates node in KML");
