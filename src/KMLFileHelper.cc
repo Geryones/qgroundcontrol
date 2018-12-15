@@ -37,11 +37,32 @@ QDomDocument KMLFileHelper::loadFile(const QString& kmlFile, QString& errorStrin
 
     return doc;
 }
-
+//This function calls another dtermineFileContents with a slightly different signature ( errorString added)
+//this function finally returns a QVariantList with the respectable type (atm polygon or polylist)
 QVariantList KMLFileHelper::determineFileContents(const QString& kmlFile)
 {
     QString errorString;
     KMLFileContents fileContents = determineFileContents(kmlFile, errorString);
+
+
+    //15.120.2018 Juri
+    //Here i try to create a 2d list with all the different forms (polygon, polyline and points)
+    //Doesn't work so far, dont know how to create a valid 2d List
+    /*
+    if (fileContents == Mixed){
+        QList<QVariantList> mixedContent;
+        QVariantList polygonList;
+        QVariantList lineList;
+        QVariantList pointList;
+        polygonList.append(QVariant::fromValue(Polygon));
+        lineList.append(QVariant::fromValue(Polyline));
+        pointList.append(QVariant::fromValue(Point));
+        mixedContent.append(polygonList);
+        mixedContent.append(lineList);
+        mixedContent.append(pointList);
+        return mixedContent;
+    }
+    */
 
     QVariantList varList;
     varList.append(QVariant::fromValue(fileContents));
@@ -56,6 +77,23 @@ KMLFileHelper::KMLFileContents KMLFileHelper::determineFileContents(const QStrin
     if (!errorString.isEmpty()) {
         return Error;
     }
+
+    //15.12.2018 Jurij
+    //Checking if the kml i provided is read correctly
+    QDomNodeList polygonNodes   =  domDocument.elementsByTagName("Polygon");
+    QDomNodeList lineNodes      =  domDocument.elementsByTagName("LineString");
+    QDomNodeList pointNodes     =  domDocument.elementsByTagName("Point");
+    QDomNodeList multiNodes     =  domDocument.elementsByTagName("MultiGeometry");
+
+    qDebug("Count for all : Polygons: %d , Lines: %d , Points: %d , Multigeometry: %d",
+           polygonNodes.count(),lineNodes.count(),pointNodes.count(), multiNodes.count());
+    /*
+    if (polygonNodes.count() && lineNodes.count()){
+        return Mixed;
+    }
+    */
+    //frome here on out original content
+
 
     QDomNodeList rgNodes = domDocument.elementsByTagName("Polygon");
     if (rgNodes.count()) {

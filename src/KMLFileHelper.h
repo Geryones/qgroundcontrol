@@ -24,6 +24,8 @@ public:
     enum KMLFileContents {
         Polygon,
         Polyline,
+        //Mixed for file with mixed forms (points, polygon, polylines)
+        Mixed,
         Error
     };
     Q_ENUM(KMLFileContents)

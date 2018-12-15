@@ -421,11 +421,21 @@ int MissionController::insertComplexMissionItem(QString itemName, QGeoCoordinate
 
     return _insertComplexMissionItemWorker(newItem, i);
 }
-
+/**
+ *this function is used to import a complex mission item like a survey scan
+ * i dont know if this is allready to late, but i surley have to analyze this to understand how and
+ * what exactly it does.. after that i can make a frist attempt to recreate a similar function for multiple
+ * polygons ...
+ * @brief MissionController::insertComplexMissionItemFromKML
+ * @param itemName the file name with the kml data
+ * @param kmlFile the file
+ * @param i ? not sure right now
+ * @return
+ */
 int MissionController::insertComplexMissionItemFromKML(QString itemName, QString kmlFile, int i)
 {
     ComplexMissionItem* newItem;
-
+    qDebug("After i choose survey i land here");
     if (itemName == _surveyMissionItemName) {
         newItem = new SurveyComplexItem(_controllerVehicle, _flyView, kmlFile, _visualItems);
     } else if (itemName == _structureScanMissionItemName) {
