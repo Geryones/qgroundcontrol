@@ -93,6 +93,7 @@ SurveyComplexItem::SurveyComplexItem(Vehicle* vehicle, bool flyView, const QStri
     connect(&_cameraCalc, &CameraCalc::distanceToSurfaceRelativeChanged, this, &SurveyComplexItem::exitCoordinateHasRelativeAltitudeChanged);
 
     if (!kmlFile.isEmpty()) {
+        qDebug("constructor for a new SurveyComplexItem.. SurveyComplexItem.cc line 96");
         _surveyAreaPolygon.loadKMLFile(kmlFile);
         _surveyAreaPolygon.setDirty(false);
     }

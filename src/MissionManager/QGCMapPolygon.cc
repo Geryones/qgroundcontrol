@@ -459,6 +459,7 @@ bool QGCMapPolygon::loadKMLFile(const QString& kmlFile)
 {
     QString errorString;
     QList<QGeoCoordinate> rgCoords;
+    qDebug("Here the loadPolygonFromFile-Function is being called, QGCMapPolygon.cc line 462");
     if (!KMLFileHelper::loadPolygonFromFile(kmlFile, rgCoords, errorString)) {
         qgcApp()->showMessage(errorString);
         return false;

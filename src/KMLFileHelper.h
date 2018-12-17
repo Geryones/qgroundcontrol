@@ -21,6 +21,7 @@ class KMLFileHelper : public QObject
     Q_OBJECT
 
 public:
+    //right now, no matter what the file contains, only ONE polygon OR  ONE polyline can be displayed
     enum KMLFileContents {
         Polygon,
         Polyline,
