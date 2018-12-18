@@ -336,17 +336,28 @@ QGCView {
                 masterController.fitViewportToItems()
                 _missionController.setCurrentPlanViewIndex(0, true)
             } else {
+                //18.12.2018 Jurij
+                // here the selected kml file is being processed
+                //the list with the content description or an error
                 var retList = KMLFileHelper.determineFileContents(file)
                 if (retList[0] == KMLFileHelper.Error) {
                     _qgcView.showMessage("Error", retList[1], StandardButton.Ok)
+                    //18.12.2018 Jurij
+                    //checking if the first parameter is of type polygon
+                    // the first thing to check has to be obstacles.. if its not an obstacle.. everythings works like before
+                } else if (retList[0] == KMLFileHelper.Mixed) {
+                    _qgcView.showMessage("Obstacles selected",retList[1], StandardButton.Ok)
                 } else if (retList[0] == KMLFileHelper.Polygon) {
                     var editVehicle = _activeVehicle ? _activeVehicle : QGroundControl.multiVehicleManager.offlineEditingVehicle
                     if (editVehicle.fixedWing) {
                         insertComplexMissionItemFromKML(_missionController.surveyComplexItemName, file, -1)
                     } else {
+                        //I suppose, that i land here and have to choose between Survey or CorridorScan
+                        //would make sense, since i dont have a vehicle connected
                         kmlPolygonSelectDialogKMLFile = file
                         _qgcView.showDialog(kmlPolygonSelectDialog, fileDialog.title, _qgcView.showDialogDefaultWidth, StandardButton.Ok | StandardButton.Cancel)
                     }
+                    //procedure for a polyline
                 } else if (retList[0] == KMLFileHelper.Polyline) {
                     insertComplexMissionItemFromKML(_missionController.corridorScanComplexItemName, file, -1)
                 }

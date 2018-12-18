@@ -41,7 +41,7 @@ QDomDocument KMLFileHelper::loadFile(const QString& kmlFile, QString& errorStrin
 //this function finally returns a QVariantList with the respectable type (atm polygon or polylist)
 QVariantList KMLFileHelper::determineFileContents(const QString& kmlFile)
 {
-    qDebug("the content of the kml file is determined, KMLFileHelper.cc line 44");
+    qDebug("the content of the kml file is being determined, KMLFileHelper.cc line 44");
     QString errorString;
     //17.12.2015 Jurij
     //An enum (Polygon, Polyline) if there is a polygon in the file... it will be polygon
@@ -94,11 +94,12 @@ KMLFileHelper::KMLFileContents KMLFileHelper::determineFileContents(const QStrin
     //After this step i have to choose if its a survey or a structrue scan... If i import obstacles this step is unnecessary
     //gotta see how i can skip this
 
-    /*
+    //18.12.2018 Jurij
+    //returning Mixed to spark the import of obstacles
     if (polygonNodes.count() && lineNodes.count()){
         return Mixed;
     }
-    */
+
     //frome here on out original content
 
 

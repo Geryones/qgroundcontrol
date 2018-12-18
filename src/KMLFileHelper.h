@@ -21,12 +21,13 @@ class KMLFileHelper : public QObject
     Q_OBJECT
 
 public:
+    //18.12.2018 Jurij
     //right now, no matter what the file contains, only ONE polygon OR  ONE polyline can be displayed
     enum KMLFileContents {
         Polygon,
         Polyline,
         //Mixed for file with mixed forms (points, polygon, polylines)
-        // Mixed,
+        Mixed,
         //Point,
         Error
     };
