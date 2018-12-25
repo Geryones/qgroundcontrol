@@ -93,7 +93,7 @@ QGCView {
     //24.12.2018 Jurij
     //first attempt to create function for Obstacle import
     function insertObstaclesFromKML(kmlFile) {
-        _qgcView.showMessage("Obstacles selected",retList[1], StandardButton.Ok)
+
 
         _missionController.insertObstaclesFromKML(kmlFile)
     }

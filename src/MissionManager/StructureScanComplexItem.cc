@@ -84,7 +84,7 @@ StructureScanComplexItem::StructureScanComplexItem(Vehicle* vehicle, bool flyVie
     _recalcLayerInfo();
 
     if (!kmlFile.isEmpty()) {
-        _structurePolygon.loadKMLFile(kmlFile);
+        _structurePolygon.loadKMLFile(kmlFile,0);
         _structurePolygon.setDirty(false);
     }
 

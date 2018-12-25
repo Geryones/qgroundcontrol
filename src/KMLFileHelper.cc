@@ -11,6 +11,8 @@
 
 #include <QFile>
 
+static int polygonCount, polylineCount, pointCount;
+
 QDomDocument KMLFileHelper::loadFile(const QString& kmlFile, QString& errorString)
 {
     QFile file(kmlFile);
@@ -85,8 +87,11 @@ KMLFileHelper::KMLFileContents KMLFileHelper::determineFileContents(const QStrin
     //15.12.2018 Jurij
     //Checking if the kml i provided is read correctly == success... all are recognized correctly
     QDomNodeList polygonNodes   =  domDocument.elementsByTagName("Polygon");
+    polygonCount                =  polygonNodes.count();
     QDomNodeList lineNodes      =  domDocument.elementsByTagName("LineString");
+    polylineCount               =  lineNodes.count();
     QDomNodeList pointNodes     =  domDocument.elementsByTagName("Point");
+    pointCount                  =  pointNodes.count();
     QDomNodeList multiNodes     =  domDocument.elementsByTagName("MultiGeometry");
 
     qDebug("Count for all : Polygons: %d , Lines: %d , Points: %d , Multigeometry: %d KMLFileHelper.cc Line 92",
@@ -117,6 +122,8 @@ KMLFileHelper::KMLFileContents KMLFileHelper::determineFileContents(const QStrin
     return Error;
 }
 
+
+
 //24.12.2018 Jurij
 // After clicking Survey and OK i go there, to create a polygon from file
 //have to find out how to do this multiple times
@@ -126,9 +133,10 @@ KMLFileHelper::KMLFileContents KMLFileHelper::determineFileContents(const QStrin
  * @param kmlFile the kml file to read
  * @param vertices the list for the vertices.. is being cleared first
  * @param errorString erros
+ * @param index: index for the polygon
  * @return if the reading of the vertices was a success
  */
-bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordinate>& vertices, QString& errorString)
+bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordinate>& vertices, QString& errorString, int index)
 {
     qDebug("Creation of Polygons happens here, KMLFileHelper Line 132");
     errorString.clear();
@@ -149,7 +157,7 @@ bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordi
 
     //Maybe with a foreach here? foreach(rgNodes.item ) ?
     //right now ONLY the first element is processed
-    QDomNode coordinatesNode = rgNodes.item(0).namedItem("outerBoundaryIs").namedItem("LinearRing").namedItem("coordinates");
+    QDomNode coordinatesNode = rgNodes.item(index).namedItem("outerBoundaryIs").namedItem("LinearRing").namedItem("coordinates");
     if (coordinatesNode.isNull()) {
         errorString = tr("Internal error: Unable to find coordinates node in KML");
         return false;
@@ -208,7 +216,7 @@ bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordi
  * @param errorString error
  * @return bool if all went as planned
  */
-bool KMLFileHelper::loadPolylineFromFile(const QString& kmlFile, QList<QGeoCoordinate>& coords, QString& errorString)
+bool KMLFileHelper::loadPolylineFromFile(const QString& kmlFile, QList<QGeoCoordinate>& coords, QString& errorString, int index)
 {
     errorString.clear();
     coords.clear();
@@ -225,7 +233,7 @@ bool KMLFileHelper::loadPolylineFromFile(const QString& kmlFile, QList<QGeoCoord
         return false;
     }
     //Only the first line in the file is processed
-    QDomNode coordinatesNode = rgNodes.item(0).namedItem("coordinates");
+    QDomNode coordinatesNode = rgNodes.item(index).namedItem("coordinates");
     if (coordinatesNode.isNull()) {
         errorString = tr("Internal error: Unable to find coordinates node in KML");
         return false;
@@ -252,4 +260,16 @@ bool KMLFileHelper::loadPolylineFromFile(const QString& kmlFile, QList<QGeoCoord
     coords = rgCoords;
 
     return true;
+}
+
+int KMLFileHelper::getPolygonCount(){
+    return polygonCount;
+}
+
+int KMLFileHelper::getPolylineCount(){
+    return polylineCount;
+}
+
+int KMLFileHelper::getPointCount(){
+    return pointCount;
 }

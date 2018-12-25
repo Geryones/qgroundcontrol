@@ -37,6 +37,10 @@ public:
 
     static KMLFileContents determineFileContents(const QString& kmlFile, QString& errorString);
     static QDomDocument loadFile(const QString& kmlFile, QString& errorString);
-    static bool loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordinate>& vertices, QString& errorString);
-    static bool loadPolylineFromFile(const QString& kmlFile, QList<QGeoCoordinate>& coords, QString& errorString);
+    static bool loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordinate>& vertices, QString& errorString, int index);
+    static bool loadPolylineFromFile(const QString& kmlFile, QList<QGeoCoordinate>& coords, QString& errorString, int index);
+    static int getPolygonCount();
+    static int getPolylineCount();
+    static int getPointCount();
+
 };

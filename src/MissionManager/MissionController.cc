@@ -29,9 +29,11 @@
 #include "QGCQGeoCoordinate.h"
 #include "PlanMasterController.h"
 #include "KML.h"
+#include "KMLFileHelper.h"
 
 #ifndef __mobile__
 #include "MainWindow.h"
+#include "QGCMapPolygon.h"
 #include "QGCQFileDialog.h"
 #endif
 
@@ -449,6 +451,31 @@ int MissionController::insertComplexMissionItemFromKML(QString itemName, QString
     }
 
     return _insertComplexMissionItemWorker(newItem, i);
+}
+
+//24.12.2018 Jurij
+//itry to create alot of obstacles
+/**
+ * @brief MissionController::insertObstacleFromKML
+ * @param kmlFile filename for kmlfile with the obstacles inside
+ * @return dont know how this works
+ */
+int MissionController::insertObstaclesFromKML(QString kmlFile){
+    qDebug()<<"We have reached the MissionController.cc Line 462";
+    qDebug()<<"Calling the all new function loadKmlFile";
+    int polygonCount = KMLFileHelper::getPolygonCount();
+    QList<QGCMapPolygon> polygons;
+    QGCMapPolygon tempPolygon;
+
+    for(int i = 0; i < polygonCount; i++){
+       tempPolygon = new QGCMapPolygon();
+       tempPolygon.loadKMLFile(kmlFile,i);
+       polygons.append(tempPolygon);
+    }
+    qDebug() <<"End of forloop... in missioncontroller.cc line 475";
+
+    //_initVisualItem(zeItem)
+    return 0;
 }
 
 int MissionController::_insertComplexMissionItemWorker(ComplexMissionItem* complexItem, int i)

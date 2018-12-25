@@ -15,7 +15,7 @@
 #include "QmlObjectListModel.h"
 #include "Vehicle.h"
 #include "QGCLoggingCategory.h"
-
+#include "QGCMapPolygon.h"
 #include "QGCGeoBoundingCube.h"
 
 #include <QHash>
@@ -121,6 +121,13 @@ public:
     ///     @param i: index to insert at, -1 for end
     /// @return Sequence number for new item
     Q_INVOKABLE int insertComplexMissionItemFromKML(QString itemName, QString kmlFile, int i);
+
+
+    //25.12.2018 Jurij trying to add obstacles
+    ///  Add a obstacles to the map
+    ///     @param kmlFile: Name of the kmlFile
+    Q_INVOKABLE int insertObstaclesFromKML(QString kmlFile);
+
 
     Q_INVOKABLE void resumeMission(int resumeIndex);
 
