@@ -461,20 +461,27 @@ int MissionController::insertComplexMissionItemFromKML(QString itemName, QString
  * @return dont know how this works
  */
 int MissionController::insertObstaclesFromKML(QString kmlFile){
-    qDebug()<<"We have reached the MissionController.cc Line 462";
+    qDebug()<<"We have reached the insertObstaclesFromKML in MissionController.cc Line 464";
     qDebug()<<"Calling the all new function loadKmlFile";
+
     int polygonCount = KMLFileHelper::getPolygonCount();
     QList<QGCMapPolygon> polygons;
     QGCMapPolygon tempPolygon;
 
+    //currently we fail  at tempPolygon = new QGCMapPolygon .. not sure
     for(int i = 0; i < polygonCount; i++){
-       tempPolygon = new QGCMapPolygon();
-       tempPolygon.loadKMLFile(kmlFile,i);
-       polygons.append(tempPolygon);
-    }
-    qDebug() <<"End of forloop... in missioncontroller.cc line 475";
 
-    //_initVisualItem(zeItem)
+       qDebug("inside the forloop at missioncontroler.cc line 474, run %d of forloop", i);
+       tempPolygon.loadKMLFile(kmlFile,i);
+       //Here we have to make it visible, when i add the polygons to _visibleItems, it crashes at the end
+       //I guess this is when list is being read via qml.. i land in the "unreadable files" (greyed out in debugger)
+       //_visualItems->insert(i, &tempPolygon);
+       polygons.append(tempPolygon);
+
+    }
+
+    qDebug() <<"End of forloop... in missioncontroller.cc line 480";
+
     return 0;
 }
 

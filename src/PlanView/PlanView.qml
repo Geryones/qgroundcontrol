@@ -93,9 +93,7 @@ QGCView {
     //24.12.2018 Jurij
     //first attempt to create function for Obstacle import
     function insertObstaclesFromKML(kmlFile) {
-
-
-        _missionController.insertObstaclesFromKML(kmlFile)
+       var sequenceNumber = _missionController.insertObstaclesFromKML(kmlFile)
     }
 
     function updateAirspace(reset) {
