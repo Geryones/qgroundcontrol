@@ -451,8 +451,9 @@ void QGCMapPolygon::offset(double distance)
     clear();
     appendVertices(rgNewPolygon);
 }
+//24.12.2018 Juri
 //I think i should start here
-//I only want to display i polygon... not a mission item...so i should create the shortcut here
+//I only want to display 1 polygon... not a mission item...so i should create the shortcut here
 //I have to figure out a way how to create multiple polygons and lines ...
 //here everything is made to create just one object
 bool QGCMapPolygon::loadKMLFile(const QString& kmlFile)

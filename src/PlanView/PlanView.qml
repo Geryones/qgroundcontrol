@@ -28,6 +28,7 @@ import QGroundControl.KMLFileHelper 1.0
 import QGroundControl.Airspace      1.0
 import QGroundControl.Airmap        1.0
 
+//24.12.2018 Jurij
 /// Mission Editor
 
 QGCView {
@@ -87,6 +88,14 @@ QGCView {
     function insertComplexMissionItemFromKML(complexItemName, kmlFile, index) {
         var sequenceNumber = _missionController.insertComplexMissionItemFromKML(complexItemName, kmlFile, index)
         _missionController.setCurrentPlanViewIndex(sequenceNumber, true)
+    }
+
+    //24.12.2018 Jurij
+    //first attempt to create function for Obstacle import
+    function insertObstaclesFromKML(kmlFile) {
+        _qgcView.showMessage("Obstacles selected",retList[1], StandardButton.Ok)
+
+        _missionController.insertObstaclesFromKML(kmlFile)
     }
 
     function updateAirspace(reset) {
@@ -331,6 +340,7 @@ QGCView {
         }
 
         onAcceptedForLoad: {
+            //we use kml files and not planFiles
             if (planFiles) {
                 masterController.loadFromFile(file)
                 masterController.fitViewportToItems()
@@ -346,7 +356,11 @@ QGCView {
                     //checking if the first parameter is of type polygon
                     // the first thing to check has to be obstacles.. if its not an obstacle.. everythings works like before
                 } else if (retList[0] == KMLFileHelper.Mixed) {
-                    _qgcView.showMessage("Obstacles selected",retList[1], StandardButton.Ok)
+
+
+                    //Here the newly created function call will be placed...
+                    insertObstaclesFromKML(file);
+
                 } else if (retList[0] == KMLFileHelper.Polygon) {
                     var editVehicle = _activeVehicle ? _activeVehicle : QGroundControl.multiVehicleManager.offlineEditingVehicle
                     if (editVehicle.fixedWing) {

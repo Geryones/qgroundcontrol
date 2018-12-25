@@ -117,7 +117,7 @@ KMLFileHelper::KMLFileContents KMLFileHelper::determineFileContents(const QStrin
     return Error;
 }
 
-
+//24.12.2018 Jurij
 // After clicking Survey and OK i go there, to create a polygon from file
 //have to find out how to do this multiple times
 //maybe if the QList<QGeoCoordinate> is changed to an 2d Array, and every polygon is stored seperatly
