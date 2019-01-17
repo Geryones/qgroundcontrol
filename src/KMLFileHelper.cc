@@ -140,7 +140,7 @@ bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordi
 {
     qDebug("Creation of Polygons happens here, KMLFileHelper Line 132");
     errorString.clear();
-    //vertices.clear() takes very long.. wonder why
+
     vertices.clear();
 
     //QDomDocument represents the whole xml file (kml)
@@ -166,6 +166,14 @@ bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordi
     //Here the coordinates are read and separated(still saved as string)
     QString coordinatesString = coordinatesNode.toElement().text().simplified();
     QStringList rgCoordinateStrings = coordinatesString.split(" ");
+
+    //17.1.2019 Jurij
+    /*qDebug("Inhalt von rgCoordinatesStrings");
+    for (int i = 0;i<rgCoordinateStrings.size();i++) {
+        QString temp = rgCoordinateStrings[i];
+        qDebug(temp.toLatin1());
+
+    }*/
 
     //the String-coordinates are transformed in coordinates
     QList<QGeoCoordinate> rgCoords;
