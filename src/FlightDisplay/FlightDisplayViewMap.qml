@@ -259,6 +259,16 @@ FlightMap {
         largeMapView:   _mainIsMap
     }
 
+    //03.01.2019 Jurij
+    //Trying to create a new Mapitem for polygon obstacles
+    /*
+      GeoFenceMapVisuals uses Polygons or a circle in the background
+      The file QGCMapPolygonVisuals.qml is allready here
+      Could be toned down... since we dont need it interactive
+
+      Where do trigger the creation of a visual?
+    */
+
     GeoFenceMapVisuals {
         map:                    flightMap
         myGeoFenceController:   _geoFenceController

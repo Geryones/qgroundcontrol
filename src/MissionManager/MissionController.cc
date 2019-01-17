@@ -454,7 +454,7 @@ int MissionController::insertComplexMissionItemFromKML(QString itemName, QString
 }
 
 //24.12.2018 Jurij
-//itry to create alot of obstacles
+//i try to create multiple obstacles
 /**
  * @brief MissionController::insertObstacleFromKML
  * @param kmlFile filename for kmlfile with the obstacles inside
@@ -468,7 +468,6 @@ int MissionController::insertObstaclesFromKML(QString kmlFile){
     QList<QGCMapPolygon> polygons;
     QGCMapPolygon tempPolygon;
 
-    //currently we fail  at tempPolygon = new QGCMapPolygon .. not sure
     for(int i = 0; i < polygonCount; i++){
 
        qDebug("inside the forloop at missioncontroler.cc line 474, run %d of forloop", i);
