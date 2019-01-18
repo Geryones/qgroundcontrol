@@ -300,6 +300,9 @@ FlightMap {
         ]
     }
 */
+    QGCMapPolygonObstacleVisuals{
+
+    }
 
 
     GeoFenceMapVisuals {

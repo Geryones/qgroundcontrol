@@ -1,5 +1,5 @@
 #include "QGCMapPolygonObstacle.h"
-
+/*
 QGCMapPolygonObstacle::QGCMapPolygonObstacle(QObject *parent)
     : QAbstractItemModel(parent)
 {
@@ -18,6 +18,7 @@ QModelIndex QGCMapPolygonObstacle::index(int row, int column, const QModelIndex 
 QModelIndex QGCMapPolygonObstacle::parent(const QModelIndex &index) const
 {
     // FIXME: Implement me!
+
 }
 
 int QGCMapPolygonObstacle::rowCount(const QModelIndex &parent) const
@@ -44,3 +45,4 @@ QVariant QGCMapPolygonObstacle::data(const QModelIndex &index, int role) const
     // FIXME: Implement me!
     return QVariant();
 }
+*/
