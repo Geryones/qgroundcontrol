@@ -392,6 +392,7 @@ void QGCApplication::_initCommon(void)
     qmlRegisterUncreatableType<RallyPointController>("QGroundControl.Controllers",          1, 0, "RallyPointController",   "Reference only");
     qmlRegisterUncreatableType<VisualMissionItem>   ("QGroundControl.Controllers",          1, 0, "VisualMissionItem",      "Reference only");
     qmlRegisterUncreatableType<FactValueSliderListModel>("QGroundControl.FactControls",     1, 0, "FactValueSliderListModel","Reference only");
+    qmlRegisterUncreatableType<ObstacleController>  ("QGroundControl.Controllers",          1, 0, "ObstacleController",     "Reference only");
 
     qmlRegisterType<QGCGeoBoundingCube>             ("QGroundControl",                      1, 0, "QGCGeoBoundingCube");
 

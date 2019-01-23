@@ -1,4 +1,4 @@
-#include "QGCMapPolygonObstacle.h"
+#include "ObstacleController.h"
 /****************************************************************************
  *
  *   (c) 2009-2016 QGROUNDCONTROL PROJECT <http://www.qgroundcontrol.org>
@@ -12,7 +12,7 @@
 /// @file
 ///     @author Don Gagne <don@thegagnes.com>
 
-#include "GeoFenceController.h"
+#include "ObstacleController.h"
 #include "Vehicle.h"
 #include "FirmwarePlugin.h"
 #include "MAVLinkProtocol.h"
