@@ -1,5 +1,5 @@
-#ifndef QGCMAPPOLYGONOBSTACLE_H
-#define QGCMAPPOLYGONOBSTACLE_H
+#ifndef ObstacleController_H
+#define ObstacleController_H
 
 #include <QAbstractItemModel>
 /****************************************************************************
@@ -11,9 +11,6 @@
  *
  ****************************************************************************/
 
-#ifndef GeoFenceController_H
-#define GeoFenceController_H
-
 #include "PlanElementController.h"
 #include "GeoFenceManager.h"
 #include "QGCFencePolygon.h"
@@ -22,16 +19,16 @@
 #include "MultiVehicleManager.h"
 #include "QGCLoggingCategory.h"
 
-Q_DECLARE_LOGGING_CATEGORY(GeoFenceControllerLog)
 
 
-class QGCMapPolygonObstacle : public PlanElementController
+
+class ObstacleController : public PlanElementController
 {
     Q_OBJECT
 
 public:
-    QGCMapPolygonObstacle(PlanMasterController* masterController, QObject* parent = NULL);
-    ~QGCMapPolygonObstacle();
+    ObstacleController(PlanMasterController* masterController, QObject* parent = NULL);
+    ~ObstacleController();
 
     Q_PROPERTY(QmlObjectListModel*  polygons            READ polygons                                       CONSTANT)
     Q_PROPERTY(QmlObjectListModel*  circles             READ circles                                        CONSTANT)
@@ -126,30 +123,3 @@ private:
 
 #endif
 
-
-/*
-class QGCMapPolygonObstacle : public QAbstractItemModel
-{
-    Q_OBJECT
-
-public:
-    explicit QGCMapPolygonObstacle(QObject *parent = nullptr);
-
-    // Header:
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-
-    // Basic functionality:
-    QModelIndex index(int row, int column,
-                      const QModelIndex &parent = QModelIndex()) const override;
-    QModelIndex parent(const QModelIndex &index) const override;
-
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-
-private:
-};
-
-#endif // QGCMAPPOLYGONOBSTACLE_H
-*/

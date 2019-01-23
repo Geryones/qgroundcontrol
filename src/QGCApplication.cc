@@ -87,6 +87,7 @@
 #include "EditPositionDialogController.h"
 #include "FactValueSliderListModel.h"
 #include "KMLFileHelper.h"
+#include "ObstacleController.h"
 
 #ifndef NO_SERIAL_LINK
 #include "SerialLink.h"

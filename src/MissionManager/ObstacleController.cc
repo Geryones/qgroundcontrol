@@ -33,32 +33,32 @@
 
 
 
-const char* QGCMapPolygonObstacle::_jsonFileTypeValue =        "GeoFence";
-const char* QGCMapPolygonObstacle::_jsonBreachReturnKey =      "breachReturn";
-const char* QGCMapPolygonObstacle::_jsonPolygonsKey =          "polygons";
-const char* QGCMapPolygonObstacle::_jsonCirclesKey =           "circles";
+const char* ObstacleController::_jsonFileTypeValue =        "GeoFence";
+const char* ObstacleController::_jsonBreachReturnKey =      "breachReturn";
+const char* ObstacleController::_jsonPolygonsKey =          "polygons";
+const char* ObstacleController::_jsonCirclesKey =           "circles";
 
-const char* QGCMapPolygonObstacle::_px4ParamCircularFence =    "GF_MAX_HOR_DIST";
+const char* ObstacleController::_px4ParamCircularFence =    "GF_MAX_HOR_DIST";
 
-QGCMapPolygonObstacle::QGCMapPolygonObstacle(PlanMasterController* masterController, QObject* parent)
+ObstacleController::ObstacleController(PlanMasterController* masterController, QObject* parent)
     : PlanElementController     (masterController, parent)
     , _geoFenceManager          (_managerVehicle->geoFenceManager())
     , _dirty                    (false)
     , _itemsRequested           (false)
     , _px4ParamCircularFenceFact(NULL)
 {
-    connect(&_polygons, &QmlObjectListModel::countChanged, this, &QGCMapPolygonObstacle::_updateContainsItems);
-    connect(&_circles,  &QmlObjectListModel::countChanged, this, &QGCMapPolygonObstacle::_updateContainsItems);
+    connect(&_polygons, &QmlObjectListModel::countChanged, this, &ObstacleController::_updateContainsItems);
+    connect(&_circles,  &QmlObjectListModel::countChanged, this, &ObstacleController::_updateContainsItems);
 
     managerVehicleChanged(_managerVehicle);
 }
 
-QGCMapPolygonObstacle::~QGCMapPolygonObstacle()
+ObstacleController::~ObstacleController()
 {
 
 }
 
-void QGCMapPolygonObstacle::start(bool flyView)
+void ObstacleController::start(bool flyView)
 {
     qCDebug(GeoFenceControllerLog) << "start flyView" << flyView;
 
@@ -66,12 +66,12 @@ void QGCMapPolygonObstacle::start(bool flyView)
     _init();
 }
 
-void QGCMapPolygonObstacle::_init(void)
+void ObstacleController::_init(void)
 {
 
 }
 
-void QGCMapPolygonObstacle::setBreachReturnPoint(const QGeoCoordinate& breachReturnPoint)
+void ObstacleController::setBreachReturnPoint(const QGeoCoordinate& breachReturnPoint)
 {
     if (_breachReturnPoint != breachReturnPoint) {
         _breachReturnPoint = breachReturnPoint;
@@ -80,14 +80,14 @@ void QGCMapPolygonObstacle::setBreachReturnPoint(const QGeoCoordinate& breachRet
     }
 }
 
-void QGCMapPolygonObstacle::_signalAll(void)
+void ObstacleController::_signalAll(void)
 {
     emit breachReturnPointChanged(breachReturnPoint());
     emit dirtyChanged(dirty());
     emit supportedChanged(supported());
 }
 
-void QGCMapPolygonObstacle::managerVehicleChanged(Vehicle* managerVehicle)
+void ObstacleController::managerVehicleChanged(Vehicle* managerVehicle)
 {
     if (_managerVehicle) {
         _geoFenceManager->disconnect(this);
@@ -104,21 +104,21 @@ void QGCMapPolygonObstacle::managerVehicleChanged(Vehicle* managerVehicle)
     }
 
     _geoFenceManager = _managerVehicle->geoFenceManager();
-    connect(_geoFenceManager, &GeoFenceManager::loadComplete,                   this, &QGCMapPolygonObstacle::_managerLoadComplete);
-    connect(_geoFenceManager, &GeoFenceManager::sendComplete,                   this, &QGCMapPolygonObstacle::_managerSendComplete);
-    connect(_geoFenceManager, &GeoFenceManager::removeAllComplete,              this, &QGCMapPolygonObstacle::_managerRemoveAllComplete);
-    connect(_geoFenceManager, &GeoFenceManager::inProgressChanged,              this, &QGCMapPolygonObstacle::syncInProgressChanged);
+    connect(_geoFenceManager, &GeoFenceManager::loadComplete,                   this, &ObstacleController::_managerLoadComplete);
+    connect(_geoFenceManager, &GeoFenceManager::sendComplete,                   this, &ObstacleController::_managerSendComplete);
+    connect(_geoFenceManager, &GeoFenceManager::removeAllComplete,              this, &ObstacleController::_managerRemoveAllComplete);
+    connect(_geoFenceManager, &GeoFenceManager::inProgressChanged,              this, &ObstacleController::syncInProgressChanged);
 
-    connect(_managerVehicle,  &Vehicle::capabilityBitsChanged,                  this, &QGCMapPolygonObstacle::supportedChanged);
+    connect(_managerVehicle,  &Vehicle::capabilityBitsChanged,                  this, &ObstacleController::supportedChanged);
 
-    connect(_managerVehicle->parameterManager(), &ParameterManager::parametersReadyChanged, this, &QGCMapPolygonObstacle::_parametersReady);
+    connect(_managerVehicle->parameterManager(), &ParameterManager::parametersReadyChanged, this, &ObstacleController::_parametersReady);
     _parametersReady();
 
     emit supportedChanged(supported());
     _signalAll();
 }
 
-bool QGCMapPolygonObstacle::load(const QJsonObject& json, QString& errorString)
+bool ObstacleController::load(const QJsonObject& json, QString& errorString)
 {
     removeAll();
 
@@ -177,7 +177,7 @@ bool QGCMapPolygonObstacle::load(const QJsonObject& json, QString& errorString)
     return true;
 }
 
-void QGCMapPolygonObstacle::save(QJsonObject& json)
+void ObstacleController::save(QJsonObject& json)
 {
     json[JsonHelper::jsonVersionKey] = _jsonCurrentVersion;
 
@@ -200,14 +200,14 @@ void QGCMapPolygonObstacle::save(QJsonObject& json)
     json[_jsonCirclesKey] = jsonCircleArray;
 }
 
-void QGCMapPolygonObstacle::removeAll(void)
+void ObstacleController::removeAll(void)
 {
     setBreachReturnPoint(QGeoCoordinate());
     _polygons.clearAndDeleteContents();
     _circles.clearAndDeleteContents();
 }
 
-void QGCMapPolygonObstacle::removeAllFromVehicle(void)
+void ObstacleController::removeAllFromVehicle(void)
 {
     if (_masterController->offline()) {
         qCWarning(GeoFenceControllerLog) << "GeoFenceController::removeAllFromVehicle called while offline";
@@ -218,7 +218,7 @@ void QGCMapPolygonObstacle::removeAllFromVehicle(void)
     }
 }
 
-void QGCMapPolygonObstacle::loadFromVehicle(void)
+void ObstacleController::loadFromVehicle(void)
 {
     if (_masterController->offline()) {
         qCWarning(GeoFenceControllerLog) << "GeoFenceController::loadFromVehicle called while offline";
@@ -230,7 +230,7 @@ void QGCMapPolygonObstacle::loadFromVehicle(void)
     }
 }
 
-void QGCMapPolygonObstacle::sendToVehicle(void)
+void ObstacleController::sendToVehicle(void)
 {
     if (_masterController->offline()) {
         qCWarning(GeoFenceControllerLog) << "GeoFenceController::sendToVehicle called while offline";
@@ -243,18 +243,18 @@ void QGCMapPolygonObstacle::sendToVehicle(void)
     }
 }
 
-bool QGCMapPolygonObstacle::syncInProgress(void) const
+bool ObstacleController::syncInProgress(void) const
 {
     return _geoFenceManager->inProgress();
 }
 
-bool QGCMapPolygonObstacle::dirty(void) const
+bool ObstacleController::dirty(void) const
 {
     return _dirty;
 }
 
 
-void QGCMapPolygonObstacle::setDirty(bool dirty)
+void ObstacleController::setDirty(bool dirty)
 {
     if (dirty != _dirty) {
         _dirty = dirty;
@@ -272,19 +272,19 @@ void QGCMapPolygonObstacle::setDirty(bool dirty)
     }
 }
 
-void QGCMapPolygonObstacle::_polygonDirtyChanged(bool dirty)
+void ObstacleController::_polygonDirtyChanged(bool dirty)
 {
     if (dirty) {
         setDirty(true);
     }
 }
 
-void QGCMapPolygonObstacle::_setDirty(void)
+void ObstacleController::_setDirty(void)
 {
     setDirty(true);
 }
 
-void QGCMapPolygonObstacle::_setFenceFromManager(const QList<QGCFencePolygon>& polygons,
+void ObstacleController::_setFenceFromManager(const QList<QGCFencePolygon>& polygons,
                                               const QList<QGCFenceCircle>&  circles)
 {
     _polygons.clearAndDeleteContents();
@@ -301,13 +301,13 @@ void QGCMapPolygonObstacle::_setFenceFromManager(const QList<QGCFencePolygon>& p
     setDirty(false);
 }
 
-void QGCMapPolygonObstacle::_setReturnPointFromManager(QGeoCoordinate breachReturnPoint)
+void ObstacleController::_setReturnPointFromManager(QGeoCoordinate breachReturnPoint)
 {
     _breachReturnPoint = breachReturnPoint;
     emit breachReturnPointChanged(_breachReturnPoint);
 }
 
-void QGCMapPolygonObstacle::_managerLoadComplete(void)
+void ObstacleController::_managerLoadComplete(void)
 {
     // Fly view always reloads on _loadComplete
     // Plan view only reloads on _loadComplete if specifically requested
@@ -321,7 +321,7 @@ void QGCMapPolygonObstacle::_managerLoadComplete(void)
     _itemsRequested = false;
 }
 
-void QGCMapPolygonObstacle::_managerSendComplete(bool error)
+void ObstacleController::_managerSendComplete(bool error)
 {
     // Fly view always reloads on manager sendComplete
     if (!error && _flyView) {
@@ -329,7 +329,7 @@ void QGCMapPolygonObstacle::_managerSendComplete(bool error)
     }
 }
 
-void QGCMapPolygonObstacle::_managerRemoveAllComplete(bool error)
+void ObstacleController::_managerRemoveAllComplete(bool error)
 {
     if (!error) {
         // Remove all from vehicle so we always update
@@ -337,17 +337,17 @@ void QGCMapPolygonObstacle::_managerRemoveAllComplete(bool error)
     }
 }
 
-bool QGCMapPolygonObstacle::containsItems(void) const
+bool ObstacleController::containsItems(void) const
 {
     return _polygons.count() > 0 || _circles.count() > 0;
 }
 
-void QGCMapPolygonObstacle::_updateContainsItems(void)
+void ObstacleController::_updateContainsItems(void)
 {
     emit containsItemsChanged(containsItems());
 }
 
-bool QGCMapPolygonObstacle::showPlanFromManagerVehicle(void)
+bool ObstacleController::showPlanFromManagerVehicle(void)
 {
     qCDebug(GeoFenceControllerLog) << "showPlanFromManagerVehicle _flyView" << _flyView;
     if (_masterController->offline()) {
@@ -373,7 +373,7 @@ bool QGCMapPolygonObstacle::showPlanFromManagerVehicle(void)
     }
 }
 
-void QGCMapPolygonObstacle::addInclusionPolygon(QGeoCoordinate topLeft, QGeoCoordinate bottomRight)
+void ObstacleController::addInclusionPolygon(QGeoCoordinate topLeft, QGeoCoordinate bottomRight)
 {
     QGeoCoordinate topRight(topLeft.latitude(), bottomRight.longitude());
     QGeoCoordinate bottomLeft(bottomRight.latitude(), topLeft.longitude());
@@ -406,7 +406,7 @@ void QGCMapPolygonObstacle::addInclusionPolygon(QGeoCoordinate topLeft, QGeoCoor
     polygon->setInteractive(true);
 }
 
-void QGCMapPolygonObstacle::addInclusionCircle(QGeoCoordinate topLeft, QGeoCoordinate bottomRight)
+void ObstacleController::addInclusionCircle(QGeoCoordinate topLeft, QGeoCoordinate bottomRight)
 {
     QGeoCoordinate topRight(topLeft.latitude(), bottomRight.longitude());
     QGeoCoordinate bottomLeft(bottomRight.latitude(), topLeft.longitude());
@@ -427,7 +427,7 @@ void QGCMapPolygonObstacle::addInclusionCircle(QGeoCoordinate topLeft, QGeoCoord
     circle->setInteractive(true);
 }
 
-void QGCMapPolygonObstacle::deletePolygon(int index)
+void ObstacleController::deletePolygon(int index)
 {
     if (index < 0 || index > _polygons.count() - 1) {
         return;
@@ -437,7 +437,7 @@ void QGCMapPolygonObstacle::deletePolygon(int index)
     polygon->deleteLater();
 }
 
-void QGCMapPolygonObstacle::deleteCircle(int index)
+void ObstacleController::deleteCircle(int index)
 {
     if (index < 0 || index > _circles.count() - 1) {
         return;
@@ -447,7 +447,7 @@ void QGCMapPolygonObstacle::deleteCircle(int index)
     circle->deleteLater();
 }
 
-void QGCMapPolygonObstacle::clearAllInteractive(void)
+void ObstacleController::clearAllInteractive(void)
 {
     for (int i=0; i<_polygons.count(); i++) {
         _polygons.value<QGCFencePolygon*>(i)->setInteractive(false);
@@ -457,13 +457,13 @@ void QGCMapPolygonObstacle::clearAllInteractive(void)
     }
 }
 
-bool QGCMapPolygonObstacle::supported(void) const
+bool ObstacleController::supported(void) const
 {
     return (_managerVehicle->capabilityBits() & MAV_PROTOCOL_CAPABILITY_MISSION_FENCE) && (_managerVehicle->maxProtoVersion() >= 200);
 }
 
 // Hack for PX4
-double QGCMapPolygonObstacle::paramCircularFence(void)
+double ObstacleController::paramCircularFence(void)
 {
     if (_managerVehicle->isOfflineEditingVehicle() || !_managerVehicle->parameterManager()->parameterExists(FactSystem::defaultComponentId, _px4ParamCircularFence)) {
         return 0;
@@ -472,7 +472,7 @@ double QGCMapPolygonObstacle::paramCircularFence(void)
     return _managerVehicle->parameterManager()->getParameter(FactSystem::defaultComponentId, _px4ParamCircularFence)->rawValue().toDouble();
 }
 
-void QGCMapPolygonObstacle::_parametersReady(void)
+void ObstacleController::_parametersReady(void)
 {
     if (_px4ParamCircularFenceFact) {
         _px4ParamCircularFenceFact->disconnect(this);
@@ -485,55 +485,7 @@ void QGCMapPolygonObstacle::_parametersReady(void)
     }
 
     _px4ParamCircularFenceFact = _managerVehicle->parameterManager()->getParameter(FactSystem::defaultComponentId, _px4ParamCircularFence);
-    connect(_px4ParamCircularFenceFact, &Fact::rawValueChanged, this, &QGCMapPolygonObstacle::paramCircularFenceChanged);
+    connect(_px4ParamCircularFenceFact, &Fact::rawValueChanged, this, &ObstacleController::paramCircularFenceChanged);
     emit paramCircularFenceChanged();
 }
 
-
-/*
-QGCMapPolygonObstacle::QGCMapPolygonObstacle(QObject *parent)
-    : QAbstractItemModel(parent)
-{
-}
-
-QVariant QGCMapPolygonObstacle::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    // FIXME: Implement me!
-}
-
-QModelIndex QGCMapPolygonObstacle::index(int row, int column, const QModelIndex &parent) const
-{
-    // FIXME: Implement me!
-}
-
-QModelIndex QGCMapPolygonObstacle::parent(const QModelIndex &index) const
-{
-    // FIXME: Implement me!
-
-}
-
-int QGCMapPolygonObstacle::rowCount(const QModelIndex &parent) const
-{
-    if (!parent.isValid())
-        return 0;
-
-    // FIXME: Implement me!
-}
-
-int QGCMapPolygonObstacle::columnCount(const QModelIndex &parent) const
-{
-    if (!parent.isValid())
-        return 0;
-
-    // FIXME: Implement me!
-}
-
-QVariant QGCMapPolygonObstacle::data(const QModelIndex &index, int role) const
-{
-    if (!index.isValid())
-        return QVariant();
-
-    // FIXME: Implement me!
-    return QVariant();
-}
-*/
