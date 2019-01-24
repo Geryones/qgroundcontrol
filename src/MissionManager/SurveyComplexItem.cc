@@ -94,7 +94,7 @@ SurveyComplexItem::SurveyComplexItem(Vehicle* vehicle, bool flyView, const QStri
 
     if (!kmlFile.isEmpty()) {
         qDebug("constructor for a new SurveyComplexItem.. SurveyComplexItem.cc line 96");
-        _surveyAreaPolygon.loadKMLFile(kmlFile, 0);
+        _surveyAreaPolygon.loadKMLFile(kmlFile);
         _surveyAreaPolygon.setDirty(false);
     }
     setDirty(false);

@@ -29,6 +29,8 @@ class MissionManager;
 class SimpleMissionItem;
 class ComplexMissionItem;
 class QDomDocument;
+class ObstacleController;
+
 
 Q_DECLARE_LOGGING_CATEGORY(MissionControllerLog)
 
@@ -126,7 +128,8 @@ public:
     //25.12.2018 Jurij trying to add obstacles
     ///  Add a obstacles to the map
     ///     @param kmlFile: Name of the kmlFile
-    Q_INVOKABLE int insertObstaclesFromKML(QString kmlFile);
+    ///     @param polygons: List where the polygons are saved to
+    Q_INVOKABLE int insertObstaclesFromKML(QString kmlFile, QList<QList<QGeoCoordinate>> &polygons);
 
 
     Q_INVOKABLE void resumeMission(int resumeIndex);

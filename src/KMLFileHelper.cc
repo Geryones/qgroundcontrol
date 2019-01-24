@@ -93,7 +93,7 @@ KMLFileHelper::KMLFileContents KMLFileHelper::determineFileContents(const QStrin
     QDomNodeList pointNodes     =  domDocument.elementsByTagName("Point");
     pointCount                  =  pointNodes.count();
     QDomNodeList multiNodes     =  domDocument.elementsByTagName("MultiGeometry");
-
+    qDebug(kmlFile.toLatin1());
     qDebug("Count for all : Polygons: %d , Lines: %d , Points: %d , Multigeometry: %d KMLFileHelper.cc Line 92",
            polygonNodes.count(),lineNodes.count(),pointNodes.count(), multiNodes.count());
     //After this step i have to choose if its a survey or a structrue scan... If i import obstacles this step is unnecessary
@@ -138,14 +138,15 @@ KMLFileHelper::KMLFileContents KMLFileHelper::determineFileContents(const QStrin
  */
 bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordinate>& vertices, QString& errorString, int index)
 {
-    qDebug("Creation of Polygons happens here, KMLFileHelper Line 132");
+    qDebug("Creation of Polygons happens here, KMLFileHelper Line 141");
     errorString.clear();
-
+    qDebug("clearing vertices");
     vertices.clear();
-
+     qDebug("clearing vertices done");
     //QDomDocument represents the whole xml file (kml)
     QDomDocument domDocument = KMLFileHelper::loadFile(kmlFile, errorString);
     if (!errorString.isEmpty()) {
+        qDebug("load file failed");
         return false;
     }
     //A list with all polygons in the xml file
@@ -154,6 +155,7 @@ bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordi
         errorString = tr("Unable to find Polygon node in KML");
         return false;
     }
+    qDebug("Polygon fetched in KMLFILEHelper 157" );
 
     //Maybe with a foreach here? foreach(rgNodes.item ) ?
     //right now ONLY the first element is processed
@@ -162,18 +164,19 @@ bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordi
         errorString = tr("Internal error: Unable to find coordinates node in KML");
         return false;
     }
+    qDebug("coordinates fetched");
 
     //Here the coordinates are read and separated(still saved as string)
     QString coordinatesString = coordinatesNode.toElement().text().simplified();
     QStringList rgCoordinateStrings = coordinatesString.split(" ");
 
     //17.1.2019 Jurij
-    /*qDebug("Inhalt von rgCoordinatesStrings");
+    qDebug("Inhalt von rgCoordinatesStrings");
     for (int i = 0;i<rgCoordinateStrings.size();i++) {
         QString temp = rgCoordinateStrings[i];
         qDebug(temp.toLatin1());
 
-    }*/
+    }
 
     //the String-coordinates are transformed in coordinates
     QList<QGeoCoordinate> rgCoords;
@@ -188,6 +191,7 @@ bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordi
 
         rgCoords.append(coord);
     }
+    qDebug("coords transformed");
 
     // Determine winding, reverse if needed
     double sum = 0;

@@ -456,12 +456,17 @@ void QGCMapPolygon::offset(double distance)
 //I only want to display 1 polygon... not a mission item...so i should create the shortcut here
 //I have to figure out a way how to create multiple polygons and lines ...
 //here everything is made to create just one object
-bool QGCMapPolygon::loadKMLFile(const QString& kmlFile, int index)
+
+
+
+
+
+bool QGCMapPolygon::loadKMLFile(const QString& kmlFile)
 {
     QString errorString;
     QList<QGeoCoordinate> rgCoords;
     qDebug("Here the loadPolygonFromFile-Function is being called, QGCMapPolygon.cc line 462");
-    if (!KMLFileHelper::loadPolygonFromFile(kmlFile, rgCoords, errorString, index)) {
+    if (!KMLFileHelper::loadPolygonFromFile(kmlFile, rgCoords, errorString, 0)) {
         qgcApp()->showMessage(errorString);
         return false;
     }
@@ -471,6 +476,8 @@ bool QGCMapPolygon::loadKMLFile(const QString& kmlFile, int index)
 
     return true;
 }
+
+
 
 
 

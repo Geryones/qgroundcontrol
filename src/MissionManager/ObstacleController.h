@@ -12,113 +12,39 @@
  ****************************************************************************/
 
 #include "PlanElementController.h"
-#include "GeoFenceManager.h"
 #include "QGCFencePolygon.h"
-#include "QGCFenceCircle.h"
-#include "Vehicle.h"
-#include "MultiVehicleManager.h"
-#include "QGCLoggingCategory.h"
+#include "MissionController.h"
 
 
 
 
-class ObstacleController : public PlanElementController
+class ObstacleController : public QmlObjectListModel
 {
     Q_OBJECT
 
 public:
-    ObstacleController(PlanMasterController* masterController, QObject* parent = NULL);
+    ObstacleController(MissionController* missionController, QObject* parent = NULL);
     ~ObstacleController();
 
     Q_PROPERTY(QmlObjectListModel*  polygons            READ polygons                                       CONSTANT)
-    Q_PROPERTY(QmlObjectListModel*  circles             READ circles                                        CONSTANT)
-    Q_PROPERTY(QGeoCoordinate       breachReturnPoint   READ breachReturnPoint  WRITE setBreachReturnPoint  NOTIFY breachReturnPointChanged)
 
-    // Hack to expose PX4 circular fence controlled by GF_MAX_HOR_DIST
-    Q_PROPERTY(double               paramCircularFence  READ paramCircularFence                             NOTIFY paramCircularFenceChanged)
-
-    /// Add a new inclusion polygon to the fence
-    ///     @param topLeft - Top left coordinate or map viewport
-    ///     @param topLeft - Bottom right left coordinate or map viewport
-    Q_INVOKABLE void addInclusionPolygon(QGeoCoordinate topLeft, QGeoCoordinate bottomRight);
-
-    /// Add a new inclusion circle to the fence
-    ///     @param topLeft - Top left coordinate or map viewport
-    ///     @param topLeft - Bottom right left coordinate or map viewport
-    Q_INVOKABLE void addInclusionCircle(QGeoCoordinate topLeft, QGeoCoordinate bottomRight);
-
-    /// Deletes the specified polygon from the polygon list
-    ///     @param index Index of poygon to delete
-    Q_INVOKABLE void deletePolygon(int index);
-
-    /// Deletes the specified circle from the circle list
-    ///     @param index Index of circle to delete
-    Q_INVOKABLE void deleteCircle(int index);
-
-    /// Clears the interactive bit from all fence items
-    Q_INVOKABLE void clearAllInteractive(void);
-
-    double paramCircularFence(void);
-
-    // Overrides from PlanElementController
-    bool supported                  (void) const final;
-    void start                      (bool flyView) final;
-    void save                       (QJsonObject& json) final;
-    bool load                       (const QJsonObject& json, QString& errorString) final;
-    void loadFromVehicle            (void) final;
-    void sendToVehicle              (void) final;
-    void removeAll                  (void) final;
-    void removeAllFromVehicle       (void) final;
-    bool syncInProgress             (void) const final;
-    bool dirty                      (void) const final;
-    void setDirty                   (bool dirty) final;
-    bool containsItems              (void) const final;
-    void managerVehicleChanged      (Vehicle* managerVehicle) final;
-    bool showPlanFromManagerVehicle (void) final;
-
-    QmlObjectListModel* polygons                (void) { return &_polygons; }
-    QmlObjectListModel* circles                 (void) { return &_circles; }
-    QGeoCoordinate      breachReturnPoint       (void) const { return _breachReturnPoint; }
-
-    void setBreachReturnPoint(const QGeoCoordinate& breachReturnPoint);
+    QmlObjectListModel* polygons                (void);
 
 signals:
-    void breachReturnPointChanged       (QGeoCoordinate breachReturnPoint);
+
     void editorQmlChanged               (QString editorQml);
     void loadComplete                   (void);
-    void paramCircularFenceChanged      (void);
 
-private slots:
-    void _polygonDirtyChanged       (bool dirty);
-    void _setDirty                  (void);
-    void _setFenceFromManager       (const QList<QGCFencePolygon>& polygons, const QList<QGCFenceCircle>&  circles);
-    void _setReturnPointFromManager (QGeoCoordinate breachReturnPoint);
-    void _managerLoadComplete       (void);
-    void _updateContainsItems       (void);
-    void _managerSendComplete       (bool error);
-    void _managerRemoveAllComplete  (bool error);
-    void _parametersReady           (void);
+
+
 
 private:
     void _init(void);
     void _signalAll(void);
-
-    GeoFenceManager*    _geoFenceManager;
-    bool                _dirty;
     QmlObjectListModel  _polygons;
-    QmlObjectListModel  _circles;
-    QGeoCoordinate      _breachReturnPoint;
-    bool                _itemsRequested;
-    Fact*               _px4ParamCircularFenceFact;
-
-    static const char* _px4ParamCircularFence;
-
-    static const int _jsonCurrentVersion = 2;
-
-    static const char* _jsonFileTypeValue;
-    static const char* _jsonBreachReturnKey;
+    QList<QList<QGeoCoordinate>>_myPolygons;
     static const char* _jsonPolygonsKey;
-    static const char* _jsonCirclesKey;
+
 };
 
 #endif

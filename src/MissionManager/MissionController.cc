@@ -30,6 +30,7 @@
 #include "PlanMasterController.h"
 #include "KML.h"
 #include "KMLFileHelper.h"
+#include "ObstacleController.h"
 
 #ifndef __mobile__
 #include "MainWindow.h"
@@ -73,11 +74,13 @@ MissionController::MissionController(PlanMasterController* masterController, QOb
     , _progressPct                  (0)
     , _currentPlanViewIndex         (-1)
     , _currentPlanViewItem          (nullptr)
+
 {
     _resetMissionFlightStatus();
     managerVehicleChanged(_managerVehicle);
     _updateTimer.setSingleShot(true);
     connect(&_updateTimer, &QTimer::timeout, this, &MissionController::_updateTimeout);
+
 }
 
 MissionController::~MissionController()
@@ -460,35 +463,27 @@ int MissionController::insertComplexMissionItemFromKML(QString itemName, QString
  * @param kmlFile filename for kmlfile with the obstacles inside
  * @return dont know how this works
  */
-int MissionController::insertObstaclesFromKML(QString kmlFile){
+int MissionController::insertObstaclesFromKML(QString kmlFile, QList<QList<QGeoCoordinate>> &polygons){
     qDebug()<<"We have reached the insertObstaclesFromKML in MissionController.cc Line 464";
     qDebug()<<"Calling the all new function loadKmlFile";
+    qDebug(kmlFile.toLatin1());
 
+
+    KMLFileHelper::determineFileContents(kmlFile);
     int polygonCount = KMLFileHelper::getPolygonCount();
-    QList<QGCMapPolygon> obstaclePolygons;
-    QGCMapPolygon tempPolygon;
+    qDebug("%d polygoncount in missioncontroller", polygonCount);
 
+    QString errors;
 
     for(int i = 0; i < polygonCount; i++){
-
-       qDebug("inside the forloop at missioncontroler.cc line 474, run %d of forloop", i);
-       tempPolygon.loadKMLFile(kmlFile,i);
-       //Here we have to make it visible, when i add the polygons to _visibleItems, it crashes at the end
-       //I guess this is when list is being read via qml.. i land in the "unreadable files" (greyed out in debugger)
-       //_visualItems->insert(i, &tempPolygon);
-       obstaclePolygons.append(tempPolygon);
+        KMLFileHelper::loadPolygonFromFile(kmlFile, polygons[i], errors, i);
 
     }
+
 
     qDebug() <<"End of forloop... in missioncontroller.cc line 480";
 
-    //this is working :)
-   // qDebug() <<"now we test if there is anything inside of this obstaclePolygon-list, still missioncontroller.cc line483";
 
-    /*for (int i = 0; i< obstaclePolygons.size(); i++) {
-        obstaclePolygons.at(i)
-    }
-    */
 
     return 0;
 }
@@ -1609,6 +1604,11 @@ void MissionController::_recalcAll(void)
 /// Initializes a new set of mission items
 void MissionController::_initAllVisualItems(void)
 {
+    qDebug() << "initAllvisualItems in misioncontroller, line 1609";
+    //Jurij
+    //24.01.2019
+
+    ObstacleController _obstacleController(this, nullptr);
     // Setup home position at index 0
 
     _settingsItem = qobject_cast<MissionSettingsItem*>(_visualItems->get(0));

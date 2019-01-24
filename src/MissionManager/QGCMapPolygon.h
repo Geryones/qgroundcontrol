@@ -58,8 +58,7 @@ public:
 
     /// Loads a polygon from a KML file
     /// @return true: success
-    Q_INVOKABLE bool loadKMLFile(const QString& kmlFile,int index);
-
+    Q_INVOKABLE bool loadKMLFile(const QString& kmlFile);
 
     /// Returns the path in a list of QGeoCoordinate's format
     QList<QGeoCoordinate> coordinateList(void) const;
