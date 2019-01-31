@@ -15,16 +15,19 @@ static int polygonCount, polylineCount, pointCount;
 
 QDomDocument KMLFileHelper::loadFile(const QString& kmlFile, QString& errorString)
 {
+    qDebug("the file string in loadFile: "+ kmlFile.toLatin1());
     QFile file(kmlFile);
 
     errorString.clear();
 
     if (!file.exists()) {
+        qDebug("file does not exist");
         errorString = tr("File not found: %1").arg(kmlFile);
         return QDomDocument();
     }
 
     if (!file.open(QIODevice::ReadOnly)) {
+        qDebug("unable to open");
         errorString = tr("Unable to open file: %1 error: $%2").arg(kmlFile).arg(file.errorString());
         return QDomDocument();
     }
@@ -33,6 +36,7 @@ QDomDocument KMLFileHelper::loadFile(const QString& kmlFile, QString& errorStrin
     QString errorMessage;
     int errorLine;
     if (!doc.setContent(&file, &errorMessage, &errorLine)) {
+        qDebug("third thing failed");
         errorString = tr("Unable to parse KML file: %1 error: %2 line: %3").arg(kmlFile).arg(errorMessage).arg(errorLine);
         return QDomDocument();
     }
@@ -79,8 +83,10 @@ QVariantList KMLFileHelper::determineFileContents(const QString& kmlFile)
 
 KMLFileHelper::KMLFileContents KMLFileHelper::determineFileContents(const QString& kmlFile, QString& errorString)
 {
+    qDebug("determine fileContents, kmlfilhelper 82");
     QDomDocument domDocument = KMLFileHelper::loadFile(kmlFile, errorString);
     if (!errorString.isEmpty()) {
+        qDebug("error in determin file contents");
         return Error;
     }
 
@@ -171,12 +177,7 @@ bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordi
     QStringList rgCoordinateStrings = coordinatesString.split(" ");
 
     //17.1.2019 Jurij
-    qDebug("Inhalt von rgCoordinatesStrings");
-    for (int i = 0;i<rgCoordinateStrings.size();i++) {
-        QString temp = rgCoordinateStrings[i];
-        qDebug(temp.toLatin1());
 
-    }
 
     //the String-coordinates are transformed in coordinates
     QList<QGeoCoordinate> rgCoords;
@@ -210,6 +211,10 @@ bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordi
         }
         rgCoords = rgReversed;
     }
+    //31.01.2019 here I have to init the print into the file to get the correct coordinates
+
+
+
     //the vertices are the corners of the polygon... and since the QCoordinateListe vertices are passed by reference
     //the function does not need to return anything.. the List is change in place
     vertices = rgCoords;
@@ -272,6 +277,118 @@ bool KMLFileHelper::loadPolylineFromFile(const QString& kmlFile, QList<QGeoCoord
     coords = rgCoords;
 
     return true;
+}
+
+bool KMLFileHelper::writePolygonToFile(const QString& kmlFileInput, const QString& outPut){
+    QString tempFileName = outPut;
+    qDebug("writePolygonToFile, kmlFilehelper");
+    qDebug(kmlFileInput.toLatin1()+ " as Input and "+outPut.toLatin1()+ " as output destination");
+    QFile myFile(tempFileName);
+    if(!myFile.open(QFile::WriteOnly | QFile::Text)){
+        qDebug("could not open my tempFile for writing");
+    }
+    QList<QGeoCoordinate> vertices;
+    QString errors;
+    QTextStream out(&myFile);
+    KMLFileHelper::determineFileContents(kmlFileInput);
+    qDebug("%d polygons in here", polygonCount);
+    out<<"Item {"<<endl;
+    out<<"readonly property var points: [{"<<endl;
+    for (int index = 0;index <polygonCount;index++) {
+        KMLFileHelper::loadPolygonFromFile(kmlFileInput, vertices,errors, index);
+
+        qDebug("size of vertices = %d", vertices.size());
+        out<<"path: ["<<endl;
+        for (int i = 0;i < vertices.size();i++) {
+
+            out<<"{latitude: ";
+            out<<vertices.at(i).latitude();
+            out<<", ";
+            out<<"longitude: ";
+            out<<vertices.at(i).longitude();
+            if (i == vertices.size()-1){
+                out<< "}"<<endl;
+                out<<"]"<<endl;
+
+            }else {
+                 out<<"},"<<endl;
+
+            }
+            myFile.flush();
+
+        }
+        if(index== polygonCount-1){
+            out<<"}"<<endl;
+        }else{
+            out<<"},"<<endl;
+            out<<"{"<<endl;
+        }
+
+
+    }
+    out<<"]"<<endl;
+    out<<"}";
+
+    myFile.flush();
+
+    myFile.close();
+    return true;
+}
+bool KMLFileHelper::writePolyLineToFile(const QString& kmlFileInput, const QString& outPut){
+    QString tempFileName = outPut;
+    qDebug("writePolygonToFile, kmlFilehelper");
+    qDebug(kmlFileInput.toLatin1()+ " as Input and "+outPut.toLatin1()+ " as output destination");
+    QFile myFile(tempFileName);
+    if(!myFile.open(QFile::WriteOnly | QFile::Text)){
+        qDebug("could not open my tempFile for writing");
+    }
+    QList<QGeoCoordinate> vertices;
+    QString errors;
+    QTextStream out(&myFile);
+    KMLFileHelper::determineFileContents(kmlFileInput);
+    qDebug("%d polygons in here", polylineCount);
+    out<<"Item {"<<endl;
+    out<<"readonly property var points: [{"<<endl;
+    for (int index = 0;index <polylineCount;index++) {
+        KMLFileHelper::loadPolylineFromFile(kmlFileInput, vertices,errors, index);
+
+        qDebug("size of vertices = %d", vertices.size());
+        out<<"path: ["<<endl;
+        for (int i = 0;i < vertices.size();i++) {
+
+            out<<"{latitude: ";
+            out<<vertices.at(i).latitude();
+            out<<", ";
+            out<<"longitude: ";
+            out<<vertices.at(i).longitude();
+            if (i == vertices.size()-1){
+                out<< "}"<<endl;
+                out<<"]"<<endl;
+
+            }else {
+                 out<<"},"<<endl;
+
+            }
+            myFile.flush();
+
+        }
+        if(index== polylineCount-1){
+            out<<"}"<<endl;
+        }else{
+            out<<"},"<<endl;
+            out<<"{"<<endl;
+        }
+
+
+    }
+    out<<"]"<<endl;
+    out<<"}";
+
+    myFile.flush();
+
+    myFile.close();
+    return true;
+
 }
 
 int KMLFileHelper::getPolygonCount(){

@@ -353,11 +353,11 @@ QGCView {
                     //18.12.2018 Jurij
                     //checking if the first parameter is of type polygon
                     // the first thing to check has to be obstacles.. if its not an obstacle.. everythings works like before
-                } else if (retList[0] == KMLFileHelper.Mixed) {
+               // } else if (retList[0] == KMLFileHelper.Mixed) {
 
 
                     //Here the newly created function call will be placed...
-                    insertObstaclesFromKML(file);
+                   // insertObstaclesFromKML(file);
 
                 } else if (retList[0] == KMLFileHelper.Polygon) {
                     var editVehicle = _activeVehicle ? _activeVehicle : QGroundControl.multiVehicleManager.offlineEditingVehicle

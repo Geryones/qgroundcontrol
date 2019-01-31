@@ -457,32 +457,24 @@ int MissionController::insertComplexMissionItemFromKML(QString itemName, QString
 }
 
 //24.12.2018 Jurij
+
 //i try to create multiple obstacles / polygons
 /**
  * @brief MissionController::insertObstacleFromKML
  * @param kmlFile filename for kmlfile with the obstacles inside
  * @return dont know how this works
  */
-int MissionController::insertObstaclesFromKML(QString kmlFile, QList<QList<QGeoCoordinate>> &polygons){
+int MissionController::insertObstaclesFromKML(QString kmlInputFile, QString kmlOutPutFilePolygon, QString kmlOutPutFileLine){
     qDebug()<<"We have reached the insertObstaclesFromKML in MissionController.cc Line 464";
     qDebug()<<"Calling the all new function loadKmlFile";
-    qDebug(kmlFile.toLatin1());
 
+    if (!KMLFileHelper::writePolygonToFile(kmlInputFile, kmlOutPutFilePolygon)){
+      qDebug("something went wrong with polygon");
+    }
 
-    KMLFileHelper::determineFileContents(kmlFile);
-    int polygonCount = KMLFileHelper::getPolygonCount();
-    qDebug("%d polygoncount in missioncontroller", polygonCount);
-
-    QString errors;
-
-   // for(int i = 0; i < polygonCount; i++){
-     //   KMLFileHelper::loadPolygonFromFile(kmlFile, polygons[i], errors, i);
-
-    //}
-
-
-    qDebug() <<"End of forloop... in missioncontroller.cc line 480";
-
+    if(!KMLFileHelper::writePolyLineToFile(kmlInputFile, kmlOutPutFileLine)){
+        qDebug("something went wrong with polyline");
+    }
 
 
     return 0;

@@ -13,12 +13,17 @@
 #include <QDomDocument>
 #include <QList>
 #include <QGeoCoordinate>
+#include <QFile>
+#include <QTextStream>
+
+
 
 /// The QGCMapPolygon class provides a polygon which can be displayed on a map using a map visuals control.
 /// It maintains a representation of the polygon on QVariantList and QmlObjectListModel format.
 class KMLFileHelper : public QObject
 {
     Q_OBJECT
+
 
 public:
     //18.12.2018 Jurij
@@ -42,5 +47,7 @@ public:
     static int getPolygonCount();
     static int getPolylineCount();
     static int getPointCount();
+    static bool writePolygonToFile(const QString& kmlFile, const QString& outPut);
+    static bool writePolyLineToFile(const QString& kmlFile, const QString& outPut);
 
 };

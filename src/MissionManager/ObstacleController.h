@@ -42,7 +42,7 @@ private:
     void _init(void);
     void _signalAll(void);
     QmlObjectListModel  _polygons;
-    QList<QList<QGeoCoordinate>>_myPolygons;
+    //QList<QList<QGeoCoordinate>>_myPolygons;
     static const char* _jsonPolygonsKey;
 
 };

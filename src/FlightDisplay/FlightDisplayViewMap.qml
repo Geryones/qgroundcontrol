@@ -281,12 +281,20 @@ FlightMap {
     Repeater {
         model: PolygonCoords.points
         MapPolygon {
-            color:  PolygonCoords.points[index].color
+            color:  "red"
             border {width: 2; color: "grey"}
             path:  PolygonCoords.points[index].path
         }
     }
 
+    Repeater {
+        model: PolyLineCoords.points
+        MapPolyline {
+
+            line {width: 5; color: "red"}
+            path:  PolyLineCoords.points[index].path
+        }
+    }
 
 
 
