@@ -475,10 +475,10 @@ int MissionController::insertObstaclesFromKML(QString kmlFile, QList<QList<QGeoC
 
     QString errors;
 
-    for(int i = 0; i < polygonCount; i++){
-        KMLFileHelper::loadPolygonFromFile(kmlFile, polygons[i], errors, i);
+   // for(int i = 0; i < polygonCount; i++){
+     //   KMLFileHelper::loadPolygonFromFile(kmlFile, polygons[i], errors, i);
 
-    }
+    //}
 
 
     qDebug() <<"End of forloop... in missioncontroller.cc line 480";

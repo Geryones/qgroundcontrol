@@ -141,7 +141,7 @@ bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordi
     qDebug("Creation of Polygons happens here, KMLFileHelper Line 141");
     errorString.clear();
     qDebug("clearing vertices");
-    vertices.clear();
+    vertices.clear(); // crashes
      qDebug("clearing vertices done");
     //QDomDocument represents the whole xml file (kml)
     QDomDocument domDocument = KMLFileHelper::loadFile(kmlFile, errorString);
