@@ -261,41 +261,6 @@ FlightMap {
 
     }
 
-    //03.01.2019 Jurij
-    //Trying to create a new Mapitem for polygon obstacles
-    /*
-      GeoFenceMapVisuals uses Polygons or a circle in the background
-      The file QGCMapPolygonVisuals.qml is allready here
-      Could be toned down... since we dont need it interactive
-
-      Where do trigger the creation of a visual?
-
-      i got the mission controller here.. the list is in the mission controller
-      gotta be possible to make it happen
-    */
-
-    //17.01.2019 Jurij
-
-
-
-    Repeater {
-        model: PolygonCoords.points
-        MapPolygon {
-            color:  "red"
-            border {width: 2; color: "grey"}
-            path:  PolygonCoords.points[index].path
-        }
-    }
-
-    Repeater {
-        model: PolyLineCoords.points
-        MapPolyline {
-
-            line {width: 5; color: "red"}
-            path:  PolyLineCoords.points[index].path
-        }
-    }
-
 
 
     GeoFenceMapVisuals {
