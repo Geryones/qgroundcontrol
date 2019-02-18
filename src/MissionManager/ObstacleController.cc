@@ -40,8 +40,8 @@ ObstacleController::ObstacleController(MissionController* missionController, QOb
     //D:\workspace\cpp\project_5\qgroundcontrol\obstacles
    qDebug() << "Obstacle Controler reached";
    QString fileInput = "D:/workspace/cpp/project_5/qgroundcontrol/obstacles/active_Obstacles.kml";
-   QString fileOutputPolygon = "D:/workspace/cpp/project_5/polygons.txt";
-   QString fileOutputLine = "D:/workspace/cpp/project_5/lines.txt";
+   QString fileOutputPolygon = "D:/workspace/cpp/project_5/PolygonCoords.qml";
+   QString fileOutputLine = "D:/workspace/cpp/project_5/PolyLines.qml";
 
 
     //missionController->insertObstaclesFromKML(fileInput,fileOutputPolygon, fileOutputLine);

@@ -107,9 +107,10 @@ KMLFileHelper::KMLFileContents KMLFileHelper::determineFileContents(const QStrin
 
     //18.12.2018 Jurij
     //returning Mixed to spark the import of obstacles
-    if (polygonNodes.count() && lineNodes.count()){
-        return Mixed;
+    /*if (polygonNodes.count() && lineNodes.count()){
+    //    return Mixed;
     }
+    */
 
     //frome here on out original content
 
@@ -226,6 +227,8 @@ bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordi
 //in this function the polyline is created
 //same as in the polygon function.. i think here i should create a 2d List with all the lines in it
 //otherwise the document has to be loaded for each element
+//07.02.2019 better: create Object polygon with a variable QList<QGeoCoordinate> path, a function void addPath(QList<QGeoCoordinate>)
+//and here a list of Polygons : QList<Polygon>... something like that
 /**
  * @brief KMLFileHelper::loadPolylineFromFile loads the coordinates from a xml file to create a polyline
  * @param kmlFile the provided file with the xml content
@@ -279,6 +282,11 @@ bool KMLFileHelper::loadPolylineFromFile(const QString& kmlFile, QList<QGeoCoord
     return true;
 }
 
+
+//TODO
+//writePolygon and writePolyline need an overhaul... for everyline, i load the whole file...
+// have to write a newer faster method, which loads and writes them in one go
+
 bool KMLFileHelper::writePolygonToFile(const QString& kmlFileInput, const QString& outPut){
     QString tempFileName = outPut;
     qDebug("writePolygonToFile, kmlFilehelper");
@@ -292,6 +300,22 @@ bool KMLFileHelper::writePolygonToFile(const QString& kmlFileInput, const QStrin
     QTextStream out(&myFile);
     KMLFileHelper::determineFileContents(kmlFileInput);
     qDebug("%d polygons in here", polygonCount);
+
+    out<<"pragma Singleton"<<endl;
+    out<<"import QtQuick          2.3"<<endl;
+    out<<"import QtQuick.Controls 1.2"<<endl;
+    out<<"import QtLocation       5.3"<<endl;
+    out<<"import QtPositioning    5.3"<<endl;
+    out<<"import QGroundControl               1.0"<<endl;
+    out<<"import QGroundControl.ScreenTools   1.0"<<endl;
+    out<<"import QGroundControl.Palette       1.0"<<endl;
+    out<<"import QGroundControl.Controls      1.0"<<endl;
+    out<<"import QGroundControl.FlightMap     1.0"<<endl;
+
+
+
+
+
     out<<"Item {"<<endl;
     out<<"readonly property var points: [{"<<endl;
     for (int index = 0;index <polygonCount;index++) {
@@ -334,6 +358,7 @@ bool KMLFileHelper::writePolygonToFile(const QString& kmlFileInput, const QStrin
     myFile.close();
     return true;
 }
+
 bool KMLFileHelper::writePolyLineToFile(const QString& kmlFileInput, const QString& outPut){
     QString tempFileName = outPut;
     qDebug("writePolygonToFile, kmlFilehelper");
@@ -346,9 +371,22 @@ bool KMLFileHelper::writePolyLineToFile(const QString& kmlFileInput, const QStri
     QString errors;
     QTextStream out(&myFile);
     KMLFileHelper::determineFileContents(kmlFileInput);
-    qDebug("%d polygons in here", polylineCount);
+    qDebug("%d polylines in here", polylineCount);
+
+    out<<"pragma Singleton"<<endl;
+    out<<"import QtQuick          2.3"<<endl;
+    out<<"import QtQuick.Controls 1.2"<<endl;
+    out<<"import QtLocation       5.3"<<endl;
+    out<<"import QtPositioning    5.3"<<endl;
+    out<<"import QGroundControl               1.0"<<endl;
+    out<<"import QGroundControl.ScreenTools   1.0"<<endl;
+    out<<"import QGroundControl.Palette       1.0"<<endl;
+    out<<"import QGroundControl.Controls      1.0"<<endl;
+    out<<"import QGroundControl.FlightMap     1.0"<<endl;
     out<<"Item {"<<endl;
     out<<"readonly property var points: [{"<<endl;
+
+
     for (int index = 0;index <polylineCount;index++) {
         KMLFileHelper::loadPolylineFromFile(kmlFileInput, vertices,errors, index);
 
@@ -390,6 +428,8 @@ bool KMLFileHelper::writePolyLineToFile(const QString& kmlFileInput, const QStri
     return true;
 
 }
+
+
 
 int KMLFileHelper::getPolygonCount(){
     return polygonCount;
