@@ -70,8 +70,10 @@ Map {
     }
     //07.02.2019 Jurij
     //Moved the obstacles from flightdisplayviewmap.qml to here
-    //now they are always desplayed
+    //now they are always displayed
 
+    //24.02.2019 Polygons removed, since the customer flies only in a small area
+    /*
     Repeater {
         model: PolygonCoords.points
         MapPolygon {
@@ -81,6 +83,9 @@ Map {
         }
     }
 
+    //24.02.2019 Polyline removed, since the customer flies only in a small area
+    //in this area is only one line
+
     Repeater {
         model: PolyLineCoords.points
         MapPolyline {
@@ -89,6 +94,33 @@ Map {
             path:  PolyLineCoords.points[index].path
         }
     }
+    */
+
+    //the area the customer flies in
+    MapPolygon{
+        border {width: 2; color: "blue"}
+        path: [
+        {latitude: 47.342060, longitude: 8.241925},
+        {latitude: 47.348904, longitude: 8.263990},
+        {latitude: 47.313248, longitude: 8.335120},
+        {latitude: 47.303218, longitude: 8.307046}
+        ]
+    }
+    //This is atm the only line the customer needs
+    MapPolyline{
+        line {width: 5; color: "red"}
+        path: [
+        {latitude: 47.3002, longitude: 8.3285},
+        {latitude: 47.3166, longitude: 8.31157},
+        {latitude: 47.3389, longitude: 8.27489},
+        {latitude: 47.3411, longitude: 8.27228},
+        {latitude: 47.3466, longitude: 8.26177},
+        {latitude: 47.3487, longitude: 8.26048}
+        ]
+    }
+
+
+
 
     Component {
         id: specifyMapPositionDialog

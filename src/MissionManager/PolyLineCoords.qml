@@ -39631,5 +39631,6 @@ path: [
 {latitude: 46.942, longitude: 10.4711}
 ]
 }
+
 ]
 }
