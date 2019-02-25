@@ -13,7 +13,7 @@ pipeline {
           }
           agent {
             docker {
-              image 'mavlink/qgc-build-android:2018-06-08'
+              image 'mavlink/qgc-build-android:2019-02-03'
               args '-v ${CCACHE_DIR}:${CCACHE_DIR}:rw'
             }
           }
@@ -42,7 +42,7 @@ pipeline {
           }
           agent {
             docker {
-              image 'mavlink/qgc-build-linux:2018-06-08'
+              image 'mavlink/qgc-build-linux:2019-02-03'
               args '-v ${CCACHE_DIR}:${CCACHE_DIR}:rw'
             }
           }
@@ -63,6 +63,36 @@ pipeline {
           }
         }
 
+        stage('Linux Debug (cmake)') {
+          environment {
+            CCACHE_BASEDIR = "${env.WORKSPACE}"
+            CMAKE_BUILD_TYPE = 'Debug'
+            QT_VERSION = "5.11.0"
+            QT_MKSPEC = "gcc_64"
+          }
+          agent {
+            docker {
+              image 'mavlink/qgc-build-linux:2019-02-03'
+              args '-v ${CCACHE_DIR}:${CCACHE_DIR}:rw'
+            }
+          }
+          steps {
+            sh 'export'
+            sh 'ccache -z'
+            sh 'make distclean'
+            sh 'make submodulesclean'
+            sh 'make linux'
+            //sh 'make linux check' // TODO: needs Xvfb or similar
+            sh 'ccache -s'
+            sh 'make distclean'
+          }
+          post {
+            cleanup {
+              sh 'git clean -ff -x -d .'
+            }
+          }
+        }
+
         stage('Linux Release') {
           environment {
             CCACHE_BASEDIR = "${env.WORKSPACE}"
@@ -71,7 +101,7 @@ pipeline {
           }
           agent {
             docker {
-              image 'mavlink/qgc-build-linux:2018-06-08'
+              image 'mavlink/qgc-build-linux:2019-02-03'
               args '-v ${CCACHE_DIR}:${CCACHE_DIR}:rw'
             }
           }
@@ -87,6 +117,35 @@ pipeline {
             sh 'mkdir build; cd build; ${QT_PATH}/${QMAKE_VER} -r ${WORKSPACE}/qgroundcontrol.pro CONFIG+=${QGC_CONFIG} CONFIG+=WarningsAsErrorsOn'
             sh 'cd build; make -j`nproc --all`'
             sh 'ccache -s'
+          }
+          post {
+            cleanup {
+              sh 'git clean -ff -x -d .'
+            }
+          }
+        }
+
+        stage('Linux Release (cmake)') {
+          environment {
+            CCACHE_BASEDIR = "${env.WORKSPACE}"
+            CMAKE_BUILD_TYPE = 'Release'
+            QT_VERSION = "5.11.0"
+            QT_MKSPEC = "gcc_64"
+          }
+          agent {
+            docker {
+              image 'mavlink/qgc-build-linux:2019-02-03'
+              args '-v ${CCACHE_DIR}:${CCACHE_DIR}:rw'
+            }
+          }
+          steps {
+            sh 'export'
+            sh 'ccache -z'
+            sh 'make distclean'
+            sh 'make submodulesclean'
+            sh 'make linux'
+            sh 'ccache -s'
+            sh 'make distclean'
           }
           post {
             cleanup {
@@ -115,6 +174,34 @@ pipeline {
             sh 'mkdir build; cd build; ${QT_PATH}/${QMAKE_VER} -r ${WORKSPACE}/qgroundcontrol.pro CONFIG+=${QGC_CONFIG} CONFIG+=WarningsAsErrorsOn'
             sh 'cd build; make -j`sysctl -n hw.ncpu`'
             sh 'ccache -s'
+          }
+          post {
+            cleanup {
+              sh 'git clean -ff -x -d .'
+            }
+          }
+        }
+
+        stage('OSX Debug (cmake)') {
+          agent {
+            node {
+              label 'mac'
+            }
+          }
+          environment {
+            CCACHE_BASEDIR = "${env.WORKSPACE}"
+            CMAKE_BUILD_TYPE = 'Debug'
+            QT_VERSION = "5.11.0"
+            QT_MKSPEC = "clang_64"
+          }
+          steps {
+            sh 'export'
+            sh 'ccache -z'
+            sh 'make distclean'
+            sh 'make submodulesclean'
+            sh 'make mac'
+            sh 'ccache -s'
+            sh 'make distclean'
           }
           post {
             cleanup {
@@ -167,6 +254,34 @@ pipeline {
                 sh 'ccache -s'
               }
             }
+          }
+          post {
+            cleanup {
+              sh 'git clean -ff -x -d .'
+            }
+          }
+        }
+
+        stage('OSX Release (cmake)') {
+          agent {
+            node {
+              label 'mac'
+            }
+          }
+          environment {
+            CCACHE_BASEDIR = "${env.WORKSPACE}"
+            CMAKE_BUILD_TYPE = 'Release'
+            QT_VERSION = "5.11.0"
+            QT_MKSPEC = "clang_64"
+          }
+          steps {
+            sh 'export'
+            sh 'ccache -z'
+            sh 'make distclean'
+            sh 'make submodulesclean'
+            sh 'make mac'
+            sh 'ccache -s'
+            sh 'make distclean'
           }
           post {
             cleanup {

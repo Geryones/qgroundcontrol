@@ -122,7 +122,7 @@ bool FirmwareImage::_ihxLoad(const QString& ihxFilename)
     
     QFile ihxFile(ihxFilename);
     if (!ihxFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        emit statusMessage(QString("Unable to open firmware file %1, error: %2").arg(ihxFilename).arg(ihxFile.errorString()));
+        emit statusMessage(QString("Unable to open firmware file %1, error: %2").arg(ihxFilename, ihxFile.errorString()));
         return false;
     }
     
@@ -223,7 +223,7 @@ bool FirmwareImage::_px4Load(const QString& imageFilename)
     
     QFile px4File(imageFilename);
     if (!px4File.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        emit statusMessage(tr("Unable to open firmware file %1, error: %2").arg(imageFilename).arg(px4File.errorString()));
+        emit statusMessage(tr("Unable to open firmware file %1, error: %2").arg(imageFilename, px4File.errorString()));
         return false;
     }
     
@@ -275,12 +275,8 @@ bool FirmwareImage::_px4Load(const QString& imageFilename)
                                         _jsonParamXmlKey,      // key which holds compressed bytes
                                         decompressedBytes);    // Returned decompressed bytes
     if (success) {
-        // Use settings location as our work directory, this way is something goes wrong the file is still there
-        // sitting next to the cache files.
-        QSettings settings;
-        QDir parameterDir = QFileInfo(settings.fileName()).dir();
-        QString parameterFilename = parameterDir.filePath("ParameterFactMetaData.xml");
-        QFile parameterFile(parameterFilename);
+        QString parameterFilename = QGCApplication::cachedParameterMetaDataFile();
+        QFile parameterFile(QGCApplication::cachedParameterMetaDataFile());
 
         if (parameterFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
             qint64 bytesWritten = parameterFile.write(decompressedBytes);
@@ -292,7 +288,7 @@ bool FirmwareImage::_px4Load(const QString& imageFilename)
                 parameterFile.close();
             }
         } else {
-            emit statusMessage(tr("Unable to open parameter meta data file %1 for writing, error: %2").arg(parameterFilename).arg(parameterFile.errorString()));
+            emit statusMessage(tr("Unable to open parameter meta data file %1 for writing, error: %2").arg(parameterFilename, parameterFile.errorString()));
         }
 
         // Cache this file with the system
@@ -306,12 +302,9 @@ bool FirmwareImage::_px4Load(const QString& imageFilename)
                                         _jsonAirframeXmlKey,        // key which holds compressed bytes
                                         decompressedBytes);         // Returned decompressed bytes
     if (success) {
-        // We cache the airframe xml in the same location as settings and parameters
-        QSettings settings;
-        QDir airframeDir = QFileInfo(settings.fileName()).dir();
-        QString airframeFilename = airframeDir.filePath("PX4AirframeFactMetaData.xml");
+        QString airframeFilename = QGCApplication::cachedAirframeMetaDataFile();
         //qDebug() << airframeFilename;
-        QFile airframeFile(airframeFilename);
+        QFile airframeFile(QGCApplication::cachedAirframeMetaDataFile());
 
         if (airframeFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
             qint64 bytesWritten = airframeFile.write(decompressedBytes);
@@ -324,7 +317,7 @@ bool FirmwareImage::_px4Load(const QString& imageFilename)
                 airframeFile.close();
             }
         } else {
-            emit statusMessage(tr("Unable to open airframe meta data file %1 for writing, error: %2").arg(airframeFilename).arg(airframeFile.errorString()));
+            emit statusMessage(tr("Unable to open airframe meta data file %1 for writing, error: %2").arg(airframeFilename, airframeFile.errorString()));
         }
     }
     
@@ -350,7 +343,7 @@ bool FirmwareImage::_px4Load(const QString& imageFilename)
     
     QFile decompressFile(decompressFilename);
     if (!decompressFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        emit statusMessage(tr("Unable to open decompressed file %1 for writing, error: %2").arg(decompressFilename).arg(decompressFile.errorString()));
+        emit statusMessage(tr("Unable to open decompressed file %1 for writing, error: %2").arg(decompressFilename, decompressFile.errorString()));
         return false;
     }
     
@@ -449,7 +442,7 @@ bool FirmwareImage::_binLoad(const QString& imageFilename)
 {
     QFile binFile(imageFilename);
     if (!binFile.open(QIODevice::ReadOnly)) {
-        emit statusMessage(tr("Unabled to open firmware file %1, %2").arg(imageFilename).arg(binFile.errorString()));
+        emit statusMessage(tr("Unabled to open firmware file %1, %2").arg(imageFilename, binFile.errorString()));
         return false;
     }
     

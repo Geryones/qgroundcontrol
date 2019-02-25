@@ -15,6 +15,7 @@ import QtQuick.Dialogs          1.2
 
 import QGroundControl                       1.0
 import QGroundControl.FactSystem            1.0
+import QGroundControl.FactControls          1.0
 import QGroundControl.Controls              1.0
 import QGroundControl.ScreenTools           1.0
 import QGroundControl.MultiVehicleManager   1.0
@@ -31,6 +32,7 @@ Rectangle {
     property real _columnSpacing:       ScreenTools.defaultFontPixelHeight * 0.25
     property bool _uploadedSelected:    false
     property var  _activeVehicle:       QGroundControl.multiVehicleManager.activeVehicle
+    property var  _showMavlinkLog:      QGroundControl.corePlugin.options.showMavlinkLogOptions
 
     QGCPalette { id: qgcPal }
 
@@ -132,8 +134,7 @@ Rectangle {
                             }
                         }
                     }
-                    //-----------------------------------------------------------------
-                    //-- Mavlink Heartbeats
+
                     QGCCheckBox {
                         text:       qsTr("Emit heartbeat")
                         checked:    QGroundControl.multiVehicleManager.gcsHeartBeatEnabled
@@ -141,8 +142,12 @@ Rectangle {
                             QGroundControl.multiVehicleManager.gcsHeartBeatEnabled = checked
                         }
                     }
-                    //-----------------------------------------------------------------
-                    //-- Mavlink Version Check
+
+                    FactCheckBox {
+                        text:   fact.shortDescription
+                        fact:   QGroundControl.settingsManager.appSettings.apmStartMavlinkStreams
+                    }
+
                     QGCCheckBox {
                         text:       qsTr("Only accept MAVs with same protocol version")
                         checked:    QGroundControl.isVersionCheckEnabled
@@ -245,6 +250,7 @@ Rectangle {
                 height:             mavlogLabel.height
                 anchors.margins:    ScreenTools.defaultFontPixelWidth
                 anchors.horizontalCenter: parent.horizontalCenter
+                visible:            _showMavlinkLog
                 QGCLabel {
                     id:             mavlogLabel
                     text:           qsTr("MAVLink 2.0 Logging (PX4 Firmware Only)")
@@ -257,6 +263,7 @@ Rectangle {
                 color:          qgcPal.windowShade
                 anchors.margins: ScreenTools.defaultFontPixelWidth
                 anchors.horizontalCenter: parent.horizontalCenter
+                visible:        _showMavlinkLog
                 Column {
                     id:         mavlogColumn
                     width:      gcsColumn.width
@@ -305,6 +312,7 @@ Rectangle {
                 height:             logLabel.height
                 anchors.margins:    ScreenTools.defaultFontPixelWidth
                 anchors.horizontalCenter: parent.horizontalCenter
+                visible:            _showMavlinkLog
                 QGCLabel {
                     id:             logLabel
                     text:           qsTr("MAVLink 2.0 Log Uploads (PX4 Firmware Only)")
@@ -317,6 +325,7 @@ Rectangle {
                 color:          qgcPal.windowShade
                 anchors.margins: ScreenTools.defaultFontPixelWidth
                 anchors.horizontalCenter: parent.horizontalCenter
+                visible:        _showMavlinkLog
                 Column {
                     id:         logColumn
                     spacing:    _columnSpacing
@@ -531,6 +540,7 @@ Rectangle {
                 height:             logFilesLabel.height
                 anchors.margins:    ScreenTools.defaultFontPixelWidth
                 anchors.horizontalCenter: parent.horizontalCenter
+                visible:            _showMavlinkLog
                 QGCLabel {
                     id:             logFilesLabel
                     text:           qsTr("Saved Log Files")
@@ -543,6 +553,7 @@ Rectangle {
                 color:          qgcPal.windowShade
                 anchors.margins: ScreenTools.defaultFontPixelWidth
                 anchors.horizontalCenter: parent.horizontalCenter
+                visible:        _showMavlinkLog
                 Column {
                     id:         logFilesColumn
                     spacing:    _columnSpacing * 4

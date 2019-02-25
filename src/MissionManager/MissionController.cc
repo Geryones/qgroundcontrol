@@ -29,6 +29,7 @@
 #include "QGCQGeoCoordinate.h"
 #include "PlanMasterController.h"
 #include "KML.h"
+#include "QGCCorePlugin.h"
 
 #ifndef __mobile__
 #include "MainWindow.h"
@@ -55,22 +56,24 @@ const char* MissionController::_jsonMavAutopilotKey =           "MAV_AUTOPILOT";
 
 const int   MissionController::_missionFileVersion =            2;
 
+const QString MissionController::patternFWLandingName      (QT_TRANSLATE_NOOP("MissionController", "Fixed Wing Landing"));
+const QString MissionController::patternStructureScanName  (QT_TRANSLATE_NOOP("MissionController", "Structure Scan"));
+const QString MissionController::patternCorridorScanName   (QT_TRANSLATE_NOOP("MissionController", "Corridor Scan"));
+
 MissionController::MissionController(PlanMasterController* masterController, QObject *parent)
-    : PlanElementController         (masterController, parent)
-    , _missionManager               (_managerVehicle->missionManager())
-    , _visualItems                  (nullptr)
-    , _settingsItem                 (nullptr)
-    , _firstItemsFromVehicle        (false)
-    , _itemsRequested               (false)
-    , _inRecalcSequence             (false)
-    , _surveyMissionItemName        (tr("Survey"))
-    , _fwLandingMissionItemName     (tr("Fixed Wing Landing"))
-    , _structureScanMissionItemName (tr("Structure Scan"))
-    , _corridorScanMissionItemName  (tr("Corridor Scan"))
-    , _appSettings                  (qgcApp()->toolbox()->settingsManager()->appSettings())
-    , _progressPct                  (0)
-    , _currentPlanViewIndex         (-1)
-    , _currentPlanViewItem          (nullptr)
+    : PlanElementController     (masterController, parent)
+    , _missionManager           (_managerVehicle->missionManager())
+    , _missionItemCount         (0)
+    , _visualItems              (nullptr)
+    , _settingsItem             (nullptr)
+    , _firstItemsFromVehicle    (false)
+    , _itemsRequested           (false)
+    , _inRecalcSequence         (false)
+    , _surveyMissionItemName    (tr("Survey"))
+    , _appSettings              (qgcApp()->toolbox()->settingsManager()->appSettings())
+    , _progressPct              (0)
+    , _currentPlanViewIndex     (-1)
+    , _currentPlanViewItem      (nullptr)
 {
     _resetMissionFlightStatus();
     managerVehicleChanged(_managerVehicle);
@@ -163,6 +166,9 @@ void MissionController::_newMissionItemsAvailableFromVehicle(bool removeAllReque
         const QList<MissionItem*>& newMissionItems = _missionManager->missionItems();
         qCDebug(MissionControllerLog) << "loading from vehicle: count"<< newMissionItems.count();
 
+        _missionItemCount = newMissionItems.count();
+        emit missionItemCountChanged(_missionItemCount);
+
         int i = 0;
         if (_controllerVehicle->firmwarePlugin()->sendHomePositionToVehicle() && newMissionItems.count() != 0) {
             // First item is fake home position
@@ -220,7 +226,7 @@ void MissionController::_warnIfTerrainFrameUsed(void)
 {
     for (int i=1; i<_visualItems->count(); i++) {
         SimpleMissionItem* simpleItem = qobject_cast<SimpleMissionItem*>(_visualItems->get(i));
-        if (simpleItem && simpleItem->altitudeMode() == SimpleMissionItem::AltitudeTerrainFrame) {
+        if (simpleItem && simpleItem->altitudeMode() == QGroundControlQmlGlobal::AltitudeModeTerrainFrame) {
             qgcApp()->showMessage(tr("Warning: You are using MAV_FRAME_GLOBAL_TERRAIN_ALT in a mission. %1 does not support sending terrain tiles to vehicle.").arg(qgcApp()->applicationName()));
             break;
         }
@@ -365,13 +371,15 @@ int MissionController::insertSimpleMissionItem(QGeoCoordinate coordinate, int i)
 
         if (_findPreviousAltitude(i, &prevAltitude, &prevAltitudeMode)) {
             newItem->altitude()->setRawValue(prevAltitude);
-            newItem->setAltitudeMode(static_cast<SimpleMissionItem::AltitudeMode>(prevAltitudeMode));
+            newItem->setAltitudeMode(static_cast<QGroundControlQmlGlobal::AltitudeMode>(prevAltitudeMode));
         }
     }
     newItem->setMissionFlightStatus(_missionFlightStatus);
     _visualItems->insert(i, newItem);
 
-    _recalcAll();
+    // We send the click coordinate through here to be able to set the planned home position from the user click location if needed
+    _recalcAllWithClickCoordinate(coordinate);
+
     return newItem->sequenceNumber();
 }
 
@@ -391,7 +399,7 @@ int MissionController::insertROIMissionItem(QGeoCoordinate coordinate, int i)
 
     if (_findPreviousAltitude(i, &prevAltitude, &prevAltitudeMode)) {
         newItem->altitude()->setRawValue(prevAltitude);
-        newItem->setAltitudeMode(static_cast<SimpleMissionItem::AltitudeMode>(prevAltitudeMode));
+        newItem->setAltitudeMode(static_cast<QGroundControlQmlGlobal::AltitudeMode>(prevAltitudeMode));
     }
     _visualItems->insert(i, newItem);
 
@@ -408,11 +416,11 @@ int MissionController::insertComplexMissionItem(QString itemName, QGeoCoordinate
     if (itemName == _surveyMissionItemName) {
         newItem = new SurveyComplexItem(_controllerVehicle, _flyView, QString() /* kmlFile */, _visualItems /* parent */);
         newItem->setCoordinate(mapCenterCoordinate);
-    } else if (itemName == _fwLandingMissionItemName) {
+    } else if (itemName == patternFWLandingName) {
         newItem = new FixedWingLandingComplexItem(_controllerVehicle, _flyView, _visualItems /* parent */);
-    } else if (itemName == _structureScanMissionItemName) {
+    } else if (itemName == patternStructureScanName) {
         newItem = new StructureScanComplexItem(_controllerVehicle, _flyView, QString() /* kmlFile */, _visualItems /* parent */);
-    } else if (itemName == _corridorScanMissionItemName) {
+    } else if (itemName == patternCorridorScanName) {
         newItem = new CorridorScanComplexItem(_controllerVehicle, _flyView, QString() /* kmlFile */, _visualItems /* parent */);
     } else {
         qWarning() << "Internal error: Unknown complex item:" << itemName;
@@ -421,28 +429,18 @@ int MissionController::insertComplexMissionItem(QString itemName, QGeoCoordinate
 
     return _insertComplexMissionItemWorker(newItem, i);
 }
-/**
- *this function is used to import a complex mission item like a survey scan
- * i dont know if this is allready to late, but i surley have to analyze this to understand how and
- * what exactly it does.. after that i can make a frist attempt to recreate a similar function for multiple
- * polygons ...
- * @brief MissionController::insertComplexMissionItemFromKML
- * @param itemName the file name with the kml data
- * @param kmlFile the file
- * @param i ? not sure right now
- * @return
- */
-int MissionController::insertComplexMissionItemFromKML(QString itemName, QString kmlFile, int i)
+
+int MissionController::insertComplexMissionItemFromKMLOrSHP(QString itemName, QString file, int i)
 {
     ComplexMissionItem* newItem;
     qDebug("After the polygon is created I land here, MissionController.cc line 438");
     //maybe a new class Obstacles which implements geometry to create all the polygons, lines and points?
     if (itemName == _surveyMissionItemName) {
-        newItem = new SurveyComplexItem(_controllerVehicle, _flyView, kmlFile, _visualItems);
-    } else if (itemName == _structureScanMissionItemName) {
-        newItem = new StructureScanComplexItem(_controllerVehicle, _flyView, kmlFile, _visualItems);
-    } else if (itemName == _corridorScanMissionItemName) {
-        newItem = new CorridorScanComplexItem(_controllerVehicle, _flyView, kmlFile, _visualItems);
+        newItem = new SurveyComplexItem(_controllerVehicle, _flyView, file, _visualItems);
+    } else if (itemName == patternStructureScanName) {
+        newItem = new StructureScanComplexItem(_controllerVehicle, _flyView, file, _visualItems);
+    } else if (itemName == patternCorridorScanName) {
+        newItem = new CorridorScanComplexItem(_controllerVehicle, _flyView, file, _visualItems);
     } else {
         qWarning() << "Internal error: Unknown complex item:" << itemName;
         return _nextSequenceNumber();
@@ -1163,7 +1161,7 @@ void MissionController::_recalcWaypointLines(void)
         // Create a temporary QObjectList and replace the model data
         QObjectList objs;
         objs.reserve(_linesTable.count());
-        foreach(CoordinateVector *vect, _linesTable.values()) {
+        for(CoordinateVector *vect: _linesTable.values()) {
             objs.append(vect);
         }
 
@@ -1533,8 +1531,10 @@ void MissionController::_recalcChildItems(void)
     }
 }
 
-void MissionController::_setPlannedHomePositionFromFirstCoordinate(void)
+void MissionController::_setPlannedHomePositionFromFirstCoordinate(const QGeoCoordinate& clickCoordinate)
 {
+    QGeoCoordinate firstCoordinate;
+
     if (_settingsItem->coordinate().isValid()) {
         return;
     }
@@ -1544,23 +1544,39 @@ void MissionController::_setPlannedHomePositionFromFirstCoordinate(void)
         VisualMissionItem* item = _visualItems->value<VisualMissionItem*>(i);
 
         if (item->specifiesCoordinate()) {
-            QGeoCoordinate plannedHomeCoord = item->coordinate().atDistanceAndAzimuth(30, 0);
-            plannedHomeCoord.setAltitude(0);
-            _settingsItem->setCoordinate(plannedHomeCoord);
+            firstCoordinate = item->coordinate();
+            break;
         }
+    }
+
+    // No item specifying a coordinate was found, in this case it we have a clickCoordinate use that
+    if (!firstCoordinate.isValid()) {
+        firstCoordinate = clickCoordinate;
+    }
+
+    if (firstCoordinate.isValid()) {
+        QGeoCoordinate plannedHomeCoord = firstCoordinate.atDistanceAndAzimuth(30, 0);
+        plannedHomeCoord.setAltitude(0);
+        _settingsItem->setCoordinate(plannedHomeCoord);
     }
 }
 
-
-void MissionController::_recalcAll(void)
+/// @param clickCoordinate The location of the user click when inserting a new item
+void MissionController::_recalcAllWithClickCoordinate(QGeoCoordinate& clickCoordinate)
 {
     if (!_flyView) {
-        _setPlannedHomePositionFromFirstCoordinate();
+        _setPlannedHomePositionFromFirstCoordinate(clickCoordinate);
     }
     _recalcSequence();
     _recalcChildItems();
     _recalcWaypointLines();
     _updateTimer.start(UPDATE_TIMEOUT);
+}
+
+void MissionController::_recalcAll(void)
+{
+    QGeoCoordinate emptyCoord;
+    _recalcAllWithClickCoordinate(emptyCoord);
 }
 
 /// Initializes a new set of mission items
@@ -1701,15 +1717,20 @@ void MissionController::managerVehicleChanged(Vehicle* managerVehicle)
 void MissionController::_managerVehicleHomePositionChanged(const QGeoCoordinate& homePosition)
 {
     if (_visualItems) {
+        bool currentDirtyBit = dirty();
+
         MissionSettingsItem* settingsItem = qobject_cast<MissionSettingsItem*>(_visualItems->get(0));
         if (settingsItem) {
             settingsItem->setHomePositionFromVehicle(homePosition);
         } else {
             qWarning() << "First item is not MissionSettingsItem";
         }
-        // Don't let this trip the dirty bit. Otherwise plan will keep getting marked dirty if vehicle home
-        // changes.
-        _visualItems->setDirty(false);
+
+        if (!currentDirtyBit) {
+            // Don't let this trip the dirty bit. Otherwise plan will keep getting marked dirty if vehicle home
+            // changes.
+            _visualItems->setDirty(false);
+        }
     }
 }
 
@@ -1933,15 +1954,15 @@ QStringList MissionController::complexMissionItemNames(void) const
     QStringList complexItems;
 
     complexItems.append(_surveyMissionItemName);
-    complexItems.append(_corridorScanMissionItemName);
+    complexItems.append(patternCorridorScanName);
     if (_controllerVehicle->fixedWing()) {
-        complexItems.append(_fwLandingMissionItemName);
+        complexItems.append(patternFWLandingName);
     }
     if (_controllerVehicle->multiRotor() || _controllerVehicle->vtol()) {
-        complexItems.append(_structureScanMissionItemName);
+        complexItems.append(patternStructureScanName);
     }
 
-    return complexItems;
+    return qgcApp()->toolbox()->corePlugin()->complexMissionItemNames(_controllerVehicle, complexItems);
 }
 
 void MissionController::resumeMission(int resumeIndex)

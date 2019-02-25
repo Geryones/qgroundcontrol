@@ -28,10 +28,6 @@ public:
     /// Signals complexDistanceChanged
     virtual double complexDistance(void) const = 0;
 
-    /// @return The item bounding cube
-    /// Signals boundingCubeChanged
-    virtual QGCGeoBoundingCube boundingCube(void) const { return QGCGeoBoundingCube(); }
-
     /// Load the complex mission item from Json
     ///     @param complexObject Complex mission item json object
     ///     @param sequenceNumber Sequence number for first MISSION_ITEM in survey
@@ -47,10 +43,6 @@ public:
 
     /// This mission item attribute specifies the type of the complex item.
     static const char* jsonComplexItemTypeKey;
-
-    // Overrides from VisualMissionItem
-    double additionalTimeDelay(void) const final { return 0; }
-
 
 signals:
     void complexDistanceChanged     (void);

@@ -10,20 +10,23 @@
 #include "KMLFileHelper.h"
 
 #include <QFile>
+#include <QVariant>
 
-QDomDocument KMLFileHelper::loadFile(const QString& kmlFile, QString& errorString)
+const char* KMLFileHelper::_errorPrefix = QT_TR_NOOP("KML file load failed. %1");
+
+QDomDocument KMLFileHelper::_loadFile(const QString& kmlFile, QString& errorString)
 {
     QFile file(kmlFile);
 
     errorString.clear();
 
     if (!file.exists()) {
-        errorString = tr("File not found: %1").arg(kmlFile);
+        errorString = QString(_errorPrefix).arg(tr("File not found: %1").arg(kmlFile));
         return QDomDocument();
     }
 
     if (!file.open(QIODevice::ReadOnly)) {
-        errorString = tr("Unable to open file: %1 error: $%2").arg(kmlFile).arg(file.errorString());
+        errorString = QString(_errorPrefix).arg(tr("Unable to open file: %1 error: $%2").arg(kmlFile).arg(file.errorString()));
         return QDomDocument();
     }
 
@@ -31,51 +34,18 @@ QDomDocument KMLFileHelper::loadFile(const QString& kmlFile, QString& errorStrin
     QString errorMessage;
     int errorLine;
     if (!doc.setContent(&file, &errorMessage, &errorLine)) {
-        errorString = tr("Unable to parse KML file: %1 error: %2 line: %3").arg(kmlFile).arg(errorMessage).arg(errorLine);
+        errorString = QString(_errorPrefix).arg(tr("Unable to parse KML file: %1 error: %2 line: %3").arg(kmlFile).arg(errorMessage).arg(errorLine));
         return QDomDocument();
     }
 
     return doc;
 }
-//This function calls another dtermineFileContents with a slightly different signature ( errorString added)
-//this function finally returns a QVariantList with the respectable type (atm polygon or polylist)
-QVariantList KMLFileHelper::determineFileContents(const QString& kmlFile)
+
+ShapeFileHelper::ShapeType KMLFileHelper::determineShapeType(const QString& kmlFile, QString& errorString)
 {
-    QString errorString;
-    KMLFileContents fileContents = determineFileContents(kmlFile, errorString);
-
-
-    //15.120.2018 Juri
-    //Here i try to create a 2d list with all the different forms (polygon, polyline and points)
-    //Doesn't work so far, dont know how to create a valid 2d List
-    /*
-    if (fileContents == Mixed){
-        QList<QVariantList> mixedContent;
-        QVariantList polygonList;
-        QVariantList lineList;
-        QVariantList pointList;
-        polygonList.append(QVariant::fromValue(Polygon));
-        lineList.append(QVariant::fromValue(Polyline));
-        pointList.append(QVariant::fromValue(Point));
-        mixedContent.append(polygonList);
-        mixedContent.append(lineList);
-        mixedContent.append(pointList);
-        return mixedContent;
-    }
-    */
-
-    QVariantList varList;
-    varList.append(QVariant::fromValue(fileContents));
-    varList.append(QVariant::fromValue(errorString));
-
-    return varList;
-}
-
-KMLFileHelper::KMLFileContents KMLFileHelper::determineFileContents(const QString& kmlFile, QString& errorString)
-{
-    QDomDocument domDocument = KMLFileHelper::loadFile(kmlFile, errorString);
+    QDomDocument domDocument = KMLFileHelper::_loadFile(kmlFile, errorString);
     if (!errorString.isEmpty()) {
-        return Error;
+        return ShapeFileHelper::Error;
     }
 
     //15.12.2018 Jurij
@@ -97,16 +67,16 @@ KMLFileHelper::KMLFileContents KMLFileHelper::determineFileContents(const QStrin
 
     QDomNodeList rgNodes = domDocument.elementsByTagName("Polygon");
     if (rgNodes.count()) {
-        return Polygon;
+        return ShapeFileHelper::Polygon;
     }
 
     rgNodes = domDocument.elementsByTagName("LineString");
     if (rgNodes.count()) {
-        return Polyline;
+        return ShapeFileHelper::Polyline;
     }
 
-    errorString = tr("No known type found in KML file.");
-    return Error;
+    errorString = QString(_errorPrefix).arg(tr("No supported type found in KML file."));
+    return ShapeFileHelper::Error;
 }
 // After clicking Survey and OK i go there, to create a polygon from file
 //have to find out how to do this multiple times
@@ -117,20 +87,20 @@ bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordi
     //vertices.clear() takes very long.. wonder why
     vertices.clear();
 
-    QDomDocument domDocument = KMLFileHelper::loadFile(kmlFile, errorString);
+    QDomDocument domDocument = KMLFileHelper::_loadFile(kmlFile, errorString);
     if (!errorString.isEmpty()) {
         return false;
     }
 
     QDomNodeList rgNodes = domDocument.elementsByTagName("Polygon");
     if (rgNodes.count() == 0) {
-        errorString = tr("Unable to find Polygon node in KML");
+        errorString = QString(_errorPrefix).arg(tr("Unable to find Polygon node in KML"));
         return false;
     }
     //Maybe with a foreach here? foreach(rgNodes.item ) ?
     QDomNode coordinatesNode = rgNodes.item(0).namedItem("outerBoundaryIs").namedItem("LinearRing").namedItem("coordinates");
     if (coordinatesNode.isNull()) {
-        errorString = tr("Internal error: Unable to find coordinates node in KML");
+        errorString = QString(_errorPrefix).arg(tr("Internal error: Unable to find coordinates node in KML"));
         return false;
     }
 
@@ -150,7 +120,7 @@ bool KMLFileHelper::loadPolygonFromFile(const QString& kmlFile, QList<QGeoCoordi
         rgCoords.append(coord);
     }
 
-    // Determine winding, reverse if needed
+    // Determine winding, reverse if needed. QGC wants clockwise winding
     double sum = 0;
     for (int i=0; i<rgCoords.count(); i++) {
         QGeoCoordinate coord1 = rgCoords[i];
@@ -178,20 +148,20 @@ bool KMLFileHelper::loadPolylineFromFile(const QString& kmlFile, QList<QGeoCoord
     errorString.clear();
     coords.clear();
 
-    QDomDocument domDocument = KMLFileHelper::loadFile(kmlFile, errorString);
+    QDomDocument domDocument = KMLFileHelper::_loadFile(kmlFile, errorString);
     if (!errorString.isEmpty()) {
         return false;
     }
 
     QDomNodeList rgNodes = domDocument.elementsByTagName("LineString");
     if (rgNodes.count() == 0) {
-        errorString = tr("Unable to find LineString node in KML");
+        errorString = QString(_errorPrefix).arg(tr("Unable to find LineString node in KML"));
         return false;
     }
 
     QDomNode coordinatesNode = rgNodes.item(0).namedItem("coordinates");
     if (coordinatesNode.isNull()) {
-        errorString = tr("Internal error: Unable to find coordinates node in KML");
+        errorString = QString(_errorPrefix).arg(tr("Internal error: Unable to find coordinates node in KML"));
         return false;
     }
 
