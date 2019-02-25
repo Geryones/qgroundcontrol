@@ -13,6 +13,21 @@ import QGroundControl.FlightMap     1.0
 
 Item {
 readonly property var points: [{
+            //this is part of a powerline. only this section is of interest for the customer
+            path: [
+            {latitude: 47.3002, longitude: 8.3285},
+            {latitude: 47.3166, longitude: 8.31157},
+            {latitude: 47.3389, longitude: 8.27489},
+            {latitude: 47.3411, longitude: 8.27228},
+            {latitude: 47.3466, longitude: 8.26177},
+            {latitude: 47.3487, longitude: 8.26048}
+            ]
+        }
+    ]
+}
+
+//Rest of file is commented out, since the customer does not need all the information at the moment
+/*
 path: [
 {latitude: 47.6761, longitude: 8.45798},
 {latitude: 47.6756, longitude: 8.4593},
@@ -39634,3 +39649,4 @@ path: [
 
 ]
 }
+*/
