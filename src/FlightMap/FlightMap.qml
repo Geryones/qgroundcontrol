@@ -173,6 +173,7 @@ Map {
             path:  PolyLineCoords.points[index].path
         }
     }
+    // Jurij
 
 
 
