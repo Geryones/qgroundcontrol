@@ -296,10 +296,23 @@ bool KMLFileHelper::writePolygonToFile(const QString& kmlFileInput, const QStrin
         qDebug("could not open my tempFile for writing");
     }
     QList<QGeoCoordinate> vertices;
-    QString errors;
+    QString errorString;
     QTextStream out(&myFile);
     KMLFileHelper::determineFileContents(kmlFileInput);
     qDebug("%d polygons in here", polygonCount);
+
+
+    QDomDocument domDocument = KMLFileHelper::loadFile(kmlFileInput, errorString);
+    if (!errorString.isEmpty()) {
+        qDebug("load file failed");
+        return false;
+    }
+    //A list with all polygons in the xml file
+    QDomNodeList rgNodes = domDocument.elementsByTagName("Polygon");
+    if (rgNodes.count() == 0) {
+        errorString = tr("Unable to find Polygon node in KML");
+        return false;
+    }
 
     out<<"pragma Singleton"<<endl;
     out<<"import QtQuick          2.3"<<endl;
@@ -313,13 +326,56 @@ bool KMLFileHelper::writePolygonToFile(const QString& kmlFileInput, const QStrin
     out<<"import QGroundControl.FlightMap     1.0"<<endl;
 
 
-
-
-
     out<<"Item {"<<endl;
     out<<"readonly property var points: [{"<<endl;
     for (int index = 0;index <polygonCount;index++) {
-        KMLFileHelper::loadPolygonFromFile(kmlFileInput, vertices,errors, index);
+
+        vertices.clear(); // crashes
+
+        QDomNode coordinatesNode = rgNodes.item(index).namedItem("outerBoundaryIs").namedItem("LinearRing").namedItem("coordinates");
+        if (coordinatesNode.isNull()) {
+            errorString = tr("Internal error: Unable to find coordinates node in KML");
+            return false;
+        }
+
+        QString coordinatesString = coordinatesNode.toElement().text().simplified();
+        QStringList rgCoordinateStrings = coordinatesString.split(" ");
+
+
+        QList<QGeoCoordinate> rgCoords;
+        for (int i=0; i<rgCoordinateStrings.count()-1; i++) {
+            QString coordinateString = rgCoordinateStrings[i];
+
+            QStringList rgValueStrings = coordinateString.split(",");
+
+            QGeoCoordinate coord;
+            coord.setLongitude(rgValueStrings[0].toDouble());
+            coord.setLatitude(rgValueStrings[1].toDouble());
+
+            rgCoords.append(coord);
+        }
+        qDebug("coords transformed");
+
+        // Determine winding, reverse if needed
+        double sum = 0;
+        for (int i=0; i<rgCoords.count(); i++) {
+            QGeoCoordinate coord1 = rgCoords[i];
+            QGeoCoordinate coord2 = (i == rgCoords.count() - 1) ? rgCoords[0] : rgCoords[i+1];
+
+            sum += (coord2.longitude() - coord1.longitude()) * (coord2.latitude() + coord1.latitude());
+        }
+        bool reverse = sum < 0.0;
+        if (reverse) {
+            QList<QGeoCoordinate> rgReversed;
+
+            for (int i=0; i<rgCoords.count(); i++) {
+                rgReversed.prepend(rgCoords[i]);
+            }
+            rgCoords = rgReversed;
+        }
+
+
+        vertices = rgCoords;
 
         qDebug("size of vertices = %d", vertices.size());
         out<<"path: ["<<endl;
@@ -368,10 +424,23 @@ bool KMLFileHelper::writePolyLineToFile(const QString& kmlFileInput, const QStri
         qDebug("could not open my tempFile for writing");
     }
     QList<QGeoCoordinate> vertices;
-    QString errors;
+    QString errorString;
     QTextStream out(&myFile);
     KMLFileHelper::determineFileContents(kmlFileInput);
     qDebug("%d polylines in here", polylineCount);
+
+    //the whole document is loaded and made available via domDocument
+    QDomDocument domDocument = KMLFileHelper::loadFile(kmlFileInput, errorString);
+    if (!errorString.isEmpty()) {
+        return false;
+    }
+
+    //Alle lines are made available in rgNodes
+    QDomNodeList rgNodes = domDocument.elementsByTagName("LineString");
+    if (rgNodes.count() == 0) {
+        errorString = tr("Unable to find LineString node in KML");
+        return false;
+    }
 
     out<<"pragma Singleton"<<endl;
     out<<"import QtQuick          2.3"<<endl;
@@ -387,8 +456,37 @@ bool KMLFileHelper::writePolyLineToFile(const QString& kmlFileInput, const QStri
     out<<"readonly property var points: [{"<<endl;
 
 
+
+    errorString.clear();
+
     for (int index = 0;index <polylineCount;index++) {
-        KMLFileHelper::loadPolylineFromFile(kmlFileInput, vertices,errors, index);
+       vertices.clear();
+       //Only the first line in the file is processed
+       QDomNode coordinatesNode = rgNodes.item(index).namedItem("coordinates");
+       if (coordinatesNode.isNull()) {
+           errorString = tr("Internal error: Unable to find coordinates node in KML");
+           return false;
+       }
+
+       //the coordinates are read from the file and processes from string to real coordinates
+       QString coordinatesString = coordinatesNode.toElement().text().simplified();
+       QStringList rgCoordinateStrings = coordinatesString.split(" ");
+
+       QList<QGeoCoordinate> rgCoords;
+       for (int i=0; i<rgCoordinateStrings.count()-1; i++) {
+           QString coordinateString = rgCoordinateStrings[i];
+
+           QStringList rgValueStrings = coordinateString.split(",");
+
+           QGeoCoordinate coord;
+           coord.setLongitude(rgValueStrings[0].toDouble());
+           coord.setLatitude(rgValueStrings[1].toDouble());
+
+           rgCoords.append(coord);
+       }
+
+       //the list is being filled and saved
+       vertices = rgCoords;
 
         qDebug("size of vertices = %d", vertices.size());
         out<<"path: ["<<endl;
