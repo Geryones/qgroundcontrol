@@ -132,7 +132,7 @@ Item {
         MapCircle {
             color:          _interiorColorInclusion
             opacity:        _interiorOpacityInclusion
-            border.color:   _borderColor
+            border.color:   "blue"
             border.width:   _borderWidthInclusion
             center:         homePosition
             radius:         _radius
