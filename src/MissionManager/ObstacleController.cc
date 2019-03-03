@@ -45,7 +45,7 @@ ObstacleController::ObstacleController(MissionController* missionController, QOb
    QString fileOutputPoint = "D:/workspace/cpp/project_5/PointCoords.qml";
 
 
-    missionController->insertObstaclesFromKML(fileInput,fileOutputPolygon, fileOutputLine, fileOutputPoint);
+    //missionController->insertObstaclesFromKML(fileInput,fileOutputPolygon, fileOutputLine, fileOutputPoint);
 
 
 

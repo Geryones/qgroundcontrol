@@ -566,7 +566,8 @@ bool KMLFileHelper::writePointToFile(const QString& kmlFileInput, const QString&
     out<<"import QGroundControl.Controls      1.0"<<endl;
     out<<"import QGroundControl.FlightMap     1.0"<<endl;
     out<<"Item {"<<endl;
-    out<<"readonly property var points: [{"<<endl;
+   // out<<"readonly property var points: [{"<<endl;
+    out<<"readonly property var points: ["<<endl;
 
 
 
@@ -591,18 +592,20 @@ bool KMLFileHelper::writePointToFile(const QString& kmlFileInput, const QString&
                point.setLongitude(rgValueStrings[0].toDouble());
                point.setLatitude(rgValueStrings[1].toDouble());
 
-               out<<"center:["<<endl;
+               //out<<"center:["<<endl;
                out<<"{latitude: ";
                out<<point.latitude();
                out<<", ";
                out<<"longitude: ";
                out<<point.longitude();
                if(index == pointCount-1){
-                   out<<"}]}"<<endl;
+                  // out<<"}]}"<<endl;
+                  // out<<"}}"<<endl;
+                   out<<"}"<<endl;
                }else{
-                   out<<"}]"<<endl;
+                  // out<<"}]"<<endl;
                    out<<"},"<<endl;
-                   out<<"{"<<endl;
+                   //out<<"{"<<endl;
                }
 
 
@@ -616,7 +619,7 @@ bool KMLFileHelper::writePointToFile(const QString& kmlFileInput, const QString&
 
 
     out<<"]"<<endl;
-    out<<"}}";
+    out<<"}";
 
     myFile.flush();
 
