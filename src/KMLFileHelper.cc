@@ -96,7 +96,7 @@ KMLFileHelper::KMLFileContents KMLFileHelper::determineFileContents(const QStrin
     polygonCount                =  polygonNodes.count();
     QDomNodeList lineNodes      =  domDocument.elementsByTagName("LineString");
     polylineCount               =  lineNodes.count();
-    QDomNodeList pointNodes     =  domDocument.elementsByTagName("Point");
+    QDomNodeList pointNodes     =  domDocument.elementsByTagName("Placemark");
     pointCount                  =  pointNodes.count();
     QDomNodeList multiNodes     =  domDocument.elementsByTagName("MultiGeometry");
     qDebug(kmlFile.toLatin1());
@@ -289,8 +289,8 @@ bool KMLFileHelper::loadPolylineFromFile(const QString& kmlFile, QList<QGeoCoord
 
 bool KMLFileHelper::writePolygonToFile(const QString& kmlFileInput, const QString& outPut){
     QString tempFileName = outPut;
-    qDebug("writePolygonToFile, kmlFilehelper");
-    qDebug(kmlFileInput.toLatin1()+ " as Input and "+outPut.toLatin1()+ " as output destination");
+   // qDebug("writePolygonToFile, kmlFilehelper");
+    //qDebug(kmlFileInput.toLatin1()+ " as Input and "+outPut.toLatin1()+ " as output destination");
     QFile myFile(tempFileName);
     if(!myFile.open(QFile::WriteOnly | QFile::Text)){
         qDebug("could not open my tempFile for writing");
@@ -299,7 +299,7 @@ bool KMLFileHelper::writePolygonToFile(const QString& kmlFileInput, const QStrin
     QString errorString;
     QTextStream out(&myFile);
     KMLFileHelper::determineFileContents(kmlFileInput);
-    qDebug("%d polygons in here", polygonCount);
+    //qDebug("%d polygons in here", polygonCount);
 
 
     QDomDocument domDocument = KMLFileHelper::loadFile(kmlFileInput, errorString);
@@ -354,7 +354,7 @@ bool KMLFileHelper::writePolygonToFile(const QString& kmlFileInput, const QStrin
 
             rgCoords.append(coord);
         }
-        qDebug("coords transformed");
+       // qDebug("coords transformed");
 
         // Determine winding, reverse if needed
         double sum = 0;
@@ -377,7 +377,7 @@ bool KMLFileHelper::writePolygonToFile(const QString& kmlFileInput, const QStrin
 
         vertices = rgCoords;
 
-        qDebug("size of vertices = %d", vertices.size());
+      //  qDebug("size of vertices = %d", vertices.size());
         out<<"path: ["<<endl;
         for (int i = 0;i < vertices.size();i++) {
 
@@ -417,8 +417,8 @@ bool KMLFileHelper::writePolygonToFile(const QString& kmlFileInput, const QStrin
 
 bool KMLFileHelper::writePolyLineToFile(const QString& kmlFileInput, const QString& outPut){
     QString tempFileName = outPut;
-    qDebug("writePolygonToFile, kmlFilehelper");
-    qDebug(kmlFileInput.toLatin1()+ " as Input and "+outPut.toLatin1()+ " as output destination");
+    //qDebug("writePolygonToFile, kmlFilehelper");
+    //qDebug(kmlFileInput.toLatin1()+ " as Input and "+outPut.toLatin1()+ " as output destination");
     QFile myFile(tempFileName);
     if(!myFile.open(QFile::WriteOnly | QFile::Text)){
         qDebug("could not open my tempFile for writing");
@@ -427,7 +427,8 @@ bool KMLFileHelper::writePolyLineToFile(const QString& kmlFileInput, const QStri
     QString errorString;
     QTextStream out(&myFile);
     KMLFileHelper::determineFileContents(kmlFileInput);
-    qDebug("%d polylines in here", polylineCount);
+   // qDebug("%d polylines in here", polylineCount);
+   // qDebug("%d points here aswell",pointCount);
 
     //the whole document is loaded and made available via domDocument
     QDomDocument domDocument = KMLFileHelper::loadFile(kmlFileInput, errorString);
@@ -488,7 +489,7 @@ bool KMLFileHelper::writePolyLineToFile(const QString& kmlFileInput, const QStri
        //the list is being filled and saved
        vertices = rgCoords;
 
-        qDebug("size of vertices = %d", vertices.size());
+       // qDebug("size of vertices = %d", vertices.size());
         out<<"path: ["<<endl;
         for (int i = 0;i < vertices.size();i++) {
 
@@ -519,6 +520,99 @@ bool KMLFileHelper::writePolyLineToFile(const QString& kmlFileInput, const QStri
     }
     out<<"]"<<endl;
     out<<"}";
+
+    myFile.flush();
+
+    myFile.close();
+    return true;
+
+}
+bool KMLFileHelper::writePointToFile(const QString& kmlFileInput, const QString& outPut){
+    QString tempFileName = outPut;
+   // qDebug("writePointToFile, kmlFilehelper");
+   // qDebug(kmlFileInput.toLatin1()+ " as Input and "+outPut.toLatin1()+ " as output destination");
+    QFile myFile(tempFileName);
+    if(!myFile.open(QFile::WriteOnly | QFile::Text)){
+        qDebug("could not open my tempFile for writing");
+    }
+    QGeoCoordinate point;
+    QString errorString;
+    QTextStream out(&myFile);
+    KMLFileHelper::determineFileContents(kmlFileInput);
+
+    //the whole document is loaded and made available via domDocument
+    QDomDocument domDocument = KMLFileHelper::loadFile(kmlFileInput, errorString);
+    if (!errorString.isEmpty()) {
+        return false;
+    }
+
+    //Alle lines are made available in rgNodes
+    //have to load every single placemark, since they all have a point in it.. no matter if it is a polygon. polyline or simple point
+
+    QDomNodeList rgNodes = domDocument.elementsByTagName("Placemark");
+    if (rgNodes.count() == 0) {
+        errorString = tr("Unable to find Placemark node in KML");
+        return false;
+    }
+
+    out<<"pragma Singleton"<<endl;
+    out<<"import QtQuick          2.3"<<endl;
+    out<<"import QtQuick.Controls 1.2"<<endl;
+    out<<"import QtLocation       5.3"<<endl;
+    out<<"import QtPositioning    5.3"<<endl;
+    out<<"import QGroundControl               1.0"<<endl;
+    out<<"import QGroundControl.ScreenTools   1.0"<<endl;
+    out<<"import QGroundControl.Palette       1.0"<<endl;
+    out<<"import QGroundControl.Controls      1.0"<<endl;
+    out<<"import QGroundControl.FlightMap     1.0"<<endl;
+    out<<"Item {"<<endl;
+    out<<"readonly property var points: [{"<<endl;
+
+
+
+    errorString.clear();
+
+    for (int index = 0;index <pointCount;index++) {
+
+       //Only the first line in the file is processed
+       //with this specific path, only "standalone" points are being written to the file
+       // points associated with linies and polygons are inside the tag MultiGeometry
+       QDomNode coordinatesNode = rgNodes.item(index).namedItem("Point").namedItem("coordinates");
+       if (coordinatesNode.isNull()) {
+           errorString = tr("Internal error: Unable to find coordinates node in KML");
+           qDebug("could now follow path to point");
+           //return false;
+       }else{
+           QString coordinatesString = coordinatesNode.toElement().text().simplified();
+
+               QStringList rgValueStrings = coordinatesString.split(",");
+
+
+               point.setLongitude(rgValueStrings[0].toDouble());
+               point.setLatitude(rgValueStrings[1].toDouble());
+
+               out<<"center:["<<endl;
+               out<<"{latitude: ";
+               out<<point.latitude();
+               out<<", ";
+               out<<"longitude: ";
+               out<<point.longitude();
+               if(index == pointCount-1){
+                   out<<"}]"<<endl;
+               }else{
+                   out<<"}],"<<endl;
+               }
+
+       }
+
+
+       //the coordinates are read from the file and processes from string to real coordinates
+
+    }
+
+
+    out<<"]"<<endl;
+    out<<"}}";
 
     myFile.flush();
 

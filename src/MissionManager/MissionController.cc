@@ -464,7 +464,7 @@ int MissionController::insertComplexMissionItemFromKML(QString itemName, QString
  * @param kmlFile filename for kmlfile with the obstacles inside
  * @return dont know how this works
  */
-int MissionController::insertObstaclesFromKML(QString kmlInputFile, QString kmlOutPutFilePolygon, QString kmlOutPutFileLine){
+int MissionController::insertObstaclesFromKML(QString kmlInputFile, QString kmlOutPutFilePolygon, QString kmlOutPutFileLine, QString kmlOutPutFilePoint){
     qDebug()<<"We have reached the insertObstaclesFromKML in MissionController.cc Line 464";
     qDebug()<<"Calling the all new function loadKmlFile";
 
@@ -474,6 +474,10 @@ int MissionController::insertObstaclesFromKML(QString kmlInputFile, QString kmlO
 
     if(!KMLFileHelper::writePolyLineToFile(kmlInputFile, kmlOutPutFileLine)){
         qDebug("something went wrong with polyline");
+    }
+
+    if(!KMLFileHelper::writePointToFile(kmlInputFile, kmlOutPutFilePoint)){
+        qDebug("something went wrong with points");
     }
 
 

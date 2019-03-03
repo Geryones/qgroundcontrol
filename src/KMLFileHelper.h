@@ -49,5 +49,6 @@ public:
     static int getPointCount();
     static bool writePolygonToFile(const QString& kmlFile, const QString& outPut);
     static bool writePolyLineToFile(const QString& kmlFile, const QString& outPut);
+    static bool writePointToFile(const QString& kmlFilej, const QString& output);
 
 };

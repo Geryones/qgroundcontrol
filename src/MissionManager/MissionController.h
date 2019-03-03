@@ -128,7 +128,7 @@ public:
     ///  Add a obstacles to the map
     ///     @param kmlFile: Name of the kmlFile
     ///     @param polygons: List where the polygons are saved to
-    Q_INVOKABLE int insertObstaclesFromKML(QString kmlInputFile, QString kmlOutPutFilePolygon, QString kmlOutPutFileLine);
+    Q_INVOKABLE int insertObstaclesFromKML(QString kmlInputFile, QString kmlOutPutFilePolygon, QString kmlOutPutFileLine, QString kmlOutPutFilePoint);
 
 
     Q_INVOKABLE void resumeMission(int resumeIndex);
