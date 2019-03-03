@@ -52,6 +52,7 @@ QGCMapLabel             1.0 QGCMapLabel.qml
 QGCMapPolygonVisuals    1.0 QGCMapPolygonVisuals.qml
 singleton PolygonCoords           1.0 PolygonCoords.qml
 singleton PolyLineCoords          1.0 PolyLineCoords.qml
+singleton PointCoords             1.0 PointCoords.qml
 QGCMapPolylineVisuals   1.0 QGCMapPolylineVisuals.qml
 QGCMouseArea            1.0 QGCMouseArea.qml
 QGCMovableItem          1.0 QGCMovableItem.qml

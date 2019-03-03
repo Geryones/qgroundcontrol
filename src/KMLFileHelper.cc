@@ -598,10 +598,14 @@ bool KMLFileHelper::writePointToFile(const QString& kmlFileInput, const QString&
                out<<"longitude: ";
                out<<point.longitude();
                if(index == pointCount-1){
-                   out<<"}]"<<endl;
+                   out<<"}]}"<<endl;
                }else{
-                   out<<"}],"<<endl;
+                   out<<"}]"<<endl;
+                   out<<"},"<<endl;
+                   out<<"{"<<endl;
                }
+
+
 
        }
 
