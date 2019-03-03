@@ -84,3 +84,4 @@ VehicleSummaryRow       1.0 VehicleSummaryRow.qml
 ViewWidget              1.0 ViewWidget.qml
 singleton PolygonCoords 1.0 PolygonCoords.qml
 singleton PolyLineCoords 1.0 PolyLineCoords.qml
+singleton PointCoords   1.0 PointCoords.qml

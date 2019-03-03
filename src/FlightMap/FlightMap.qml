@@ -173,6 +173,17 @@ Map {
             path:  PolyLineCoords.points[index].path
         }
     }
+
+    Repeater {
+            model: PointCoords.points
+            MapCircle {
+               center.latitude: PointCoords.points[index].latitude
+               center.longitude: PointCoords.points[index].longitude
+                radius: 30
+                border.width: 3
+                color: "red"
+            }
+        }
     // Jurij
 
 
