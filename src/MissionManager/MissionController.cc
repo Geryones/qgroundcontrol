@@ -480,6 +480,8 @@ int MissionController::insertObstaclesFromKML(QString kmlInputFile, QString kmlO
         qDebug("something went wrong with points");
     }
 
+    qDebug("we made %d Polygons", KMLFileHelper::getPolygonCount());
+    qDebug("we made %d PolyLines", KMLFileHelper::getPolylineCount());
 
     return 0;
 }

@@ -289,6 +289,7 @@ bool KMLFileHelper::loadPolylineFromFile(const QString& kmlFile, QList<QGeoCoord
 
 bool KMLFileHelper::writePolygonToFile(const QString& kmlFileInput, const QString& outPut){
     QString tempFileName = outPut;
+
    // qDebug("writePolygonToFile, kmlFilehelper");
     //qDebug(kmlFileInput.toLatin1()+ " as Input and "+outPut.toLatin1()+ " as output destination");
     QFile myFile(tempFileName);
@@ -354,6 +355,7 @@ bool KMLFileHelper::writePolygonToFile(const QString& kmlFileInput, const QStrin
 
             rgCoords.append(coord);
         }
+
        // qDebug("coords transformed");
 
         // Determine winding, reverse if needed
@@ -373,7 +375,6 @@ bool KMLFileHelper::writePolygonToFile(const QString& kmlFileInput, const QStrin
             }
             rgCoords = rgReversed;
         }
-
 
         vertices = rgCoords;
 
@@ -412,6 +413,7 @@ bool KMLFileHelper::writePolygonToFile(const QString& kmlFileInput, const QStrin
     myFile.flush();
 
     myFile.close();
+
     return true;
 }
 
@@ -420,6 +422,7 @@ bool KMLFileHelper::writePolyLineToFile(const QString& kmlFileInput, const QStri
     //qDebug("writePolygonToFile, kmlFilehelper");
     //qDebug(kmlFileInput.toLatin1()+ " as Input and "+outPut.toLatin1()+ " as output destination");
     QFile myFile(tempFileName);
+
     if(!myFile.open(QFile::WriteOnly | QFile::Text)){
         qDebug("could not open my tempFile for writing");
     }
@@ -486,6 +489,7 @@ bool KMLFileHelper::writePolyLineToFile(const QString& kmlFileInput, const QStri
            rgCoords.append(coord);
        }
 
+
        //the list is being filled and saved
        vertices = rgCoords;
 
@@ -524,6 +528,7 @@ bool KMLFileHelper::writePolyLineToFile(const QString& kmlFileInput, const QStri
     myFile.flush();
 
     myFile.close();
+
     return true;
 
 }
@@ -531,6 +536,7 @@ bool KMLFileHelper::writePointToFile(const QString& kmlFileInput, const QString&
     QString tempFileName = outPut;
    // qDebug("writePointToFile, kmlFilehelper");
    // qDebug(kmlFileInput.toLatin1()+ " as Input and "+outPut.toLatin1()+ " as output destination");
+    int count =0;
     QFile myFile(tempFileName);
     if(!myFile.open(QFile::WriteOnly | QFile::Text)){
         qDebug("could not open my tempFile for writing");
@@ -581,9 +587,10 @@ bool KMLFileHelper::writePointToFile(const QString& kmlFileInput, const QString&
        QDomNode coordinatesNode = rgNodes.item(index).namedItem("Point").namedItem("coordinates");
        if (coordinatesNode.isNull()) {
            errorString = tr("Internal error: Unable to find coordinates node in KML");
-           qDebug("could now follow path to point");
+           //qDebug("could now follow path to point");
            //return false;
        }else{
+           count +=1;
            QString coordinatesString = coordinatesNode.toElement().text().simplified();
 
                QStringList rgValueStrings = coordinatesString.split(",");
@@ -611,6 +618,7 @@ bool KMLFileHelper::writePointToFile(const QString& kmlFileInput, const QString&
 
 
        }
+       qDebug("created %d points", count);
 
 
        //the coordinates are read from the file and processes from string to real coordinates
