@@ -10,10 +10,6 @@ import QGroundControl.Controls      1.0
 import QGroundControl.FlightMap     1.0
 Item {
 readonly property var points: [
-{latitude: 47.3374, longitude: 8.27567}
-]}
-
-        /*
 {latitude: 47.683, longitude: 8.42202},
 {latitude: 47.767, longitude: 8.49575},
 {latitude: 47.6578, longitude: 8.49264},
@@ -2404,4 +2400,3 @@ readonly property var points: [
 {latitude: 46.9379, longitude: 10.4843}
 ]
 }
-*/

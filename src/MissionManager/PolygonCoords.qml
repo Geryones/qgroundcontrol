@@ -3,31 +3,13 @@ import QtQuick          2.3
 import QtQuick.Controls 1.2
 import QtLocation       5.3
 import QtPositioning    5.3
-
 import QGroundControl               1.0
 import QGroundControl.ScreenTools   1.0
 import QGroundControl.Palette       1.0
 import QGroundControl.Controls      1.0
 import QGroundControl.FlightMap     1.0
-
-
-
-
 Item {
 readonly property var points: [{
-            //this polygon represents the flying area at this point. because it is very small, all obstacles outside of it are not shown
-            path: [
-                {latitude: 47.342060, longitude: 8.241925},
-                {latitude: 47.348904, longitude: 8.263990},
-                {latitude: 47.313248, longitude: 8.335120},
-                {latitude: 47.303218, longitude: 8.307046}
-            ]
-        }
-    ]
-}
-
-//Rest of file is commented out, since the customer does not need this information at the moment
-/*
 path: [
 {latitude: 47.3099, longitude: 8.9575},
 {latitude: 47.3122, longitude: 8.95964},
@@ -293,5 +275,3 @@ path: [
 }
 ]
 }
-*/
-

@@ -37,33 +37,29 @@ const char* ObstacleController::_jsonPolygonsKey =          "polygons";
 ObstacleController::ObstacleController(MissionController* missionController, QObject* parent)
 
 {
-    //D:\workspace\cpp\project_5\qgroundcontrol\obstacles
-   qDebug() << "Obstacle Controler reached";
+     //qDebug() << "Obstacle Controler reached";
+    //Declare where the file is stored
    QString fileInput = "D:/workspace/cpp/project_5/qgroundcontrol/obstacles/active_Obstacles.kml";
-   QString fileOutputPolygon = "D:/workspace/cpp/project_5/PolygonCoords.qml";
-   QString fileOutputLine = "D:/workspace/cpp/project_5/PolyLineCoords.qml";
-   QString fileOutputPoint = "D:/workspace/cpp/project_5/PointCoords.qml";
 
+   //Path to the project
+   QString pathToProject = "D:/workspace/cpp/project_5/qgroundcontrol/";
+   //Path in the project - do not change this one
+   QString pathToObstacles = "obstacles/";
+   //Output paths with the filename at the end
+   QString fileOutputPolygon =  pathToProject + pathToObstacles + "PolygonCoords.qml";
+   QString fileOutputLine =     pathToProject + pathToObstacles + "PolyLineCoords.qml";
+   QString fileOutputPoint =    pathToProject + pathToObstacles + "PointCoords.qml";
 
-    //missionController->insertObstaclesFromKML(fileInput,fileOutputPolygon, fileOutputLine, fileOutputPoint);
-
+   //to create the obstacle files, comment in the line below. Make sure the path variables are correct
+   /*
+    * */
+   missionController->insertObstaclesFromKML(fileInput,fileOutputPolygon, fileOutputLine, fileOutputPoint);
 
 
    // qDebug("we have %d polygons in the list", _myPolygons.count());
 
 
 
-/*
-    for (int i = 0;i < _polygons.count(); i++) {
-        qDebug() << "obstacle controller first loop";
-       QGCMapPolygon temp =  _polygons[i];
-       QList<QGeoCoordinate> coords = temp.coordinateList();
-       for(int a = 0; i < coords.count(); i++){
-            QString string = coords.at(a).toString();
-            qDebug(string.toLatin1());
-       }
-    }
-    */
 
 
 }

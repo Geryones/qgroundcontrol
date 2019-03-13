@@ -257,7 +257,7 @@ QGCView {
           this function is to load the kml file.. it is called after we select Load kml or my option
           load kml obstacles...
           i think here it should split from the load kml... -path, if load kml obstacles was selected
-          sadly i dont understand what happens now
+
         */
         function loadKmlFromSelectedFile() {
             fileDialog.title =          qsTr("Load KML")
