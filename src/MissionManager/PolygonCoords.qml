@@ -17,10 +17,10 @@ Item {
 readonly property var points: [{
             //this polygon represents the flying area at this point. because it is very small, all obstacles outside of it are not shown
             path: [
-            {latitude: 47.342060, longitude: 8.241925},
-            {latitude: 47.348904, longitude: 8.263990},
-            {latitude: 47.313248, longitude: 8.335120},
-            {latitude: 47.303218, longitude: 8.307046}
+                {latitude: 47.342060, longitude: 8.241925},
+                {latitude: 47.348904, longitude: 8.263990},
+                {latitude: 47.313248, longitude: 8.335120},
+                {latitude: 47.303218, longitude: 8.307046}
             ]
         }
     ]

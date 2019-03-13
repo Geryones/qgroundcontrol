@@ -158,6 +158,11 @@ Map {
     Repeater {
         model: PolygonCoords.points
         MapPolygon {
+            /* Sobald man Hindernisse darstellen will und nicht die aktuelle Flugzone, kann das
+              einkommentiert werden. Die Linienfarbe kann ausgeblendet werden sobald die Fläche koloriert ist
+            color: "red"
+            opacity: 0.3
+            */
             border {width: 2; color: "blue"}
             path:  PolygonCoords.points[index].path
         }
@@ -168,8 +173,8 @@ Map {
     Repeater {
         model: PolyLineCoords.points
         MapPolyline {
-
             line {width: 5; color: "red"}
+            opacity: 0.8
             path:  PolyLineCoords.points[index].path
         }
     }
@@ -180,8 +185,9 @@ Map {
                center.latitude: PointCoords.points[index].latitude
                center.longitude: PointCoords.points[index].longitude
                 radius: 30
-                border.width: 3
+                border.width: 0
                 color: "red"
+                opacity: 0.8
             }
         }
     // Jurij
