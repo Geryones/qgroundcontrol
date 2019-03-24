@@ -22,6 +22,16 @@ readonly property var points: [{
                 {latitude: 47.313248, longitude: 8.335120},
                 {latitude: 47.303218, longitude: 8.307046}
             ]
+
+            /*path: [
+                {latitude: 47.33660, longitude: 8.27173},
+                {latitude: 47.33719, longitude: 8.27097},
+                {latitude: 47.33779, longitude: 8.27181},
+                {latitude: 47.33809, longitude: 8.27268},
+                {latitude: 47.33749, longitude: 8.27345}
+
+            ]*/
+
         }
     ]
 }

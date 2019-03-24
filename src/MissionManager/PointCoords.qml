@@ -9,13 +9,15 @@ import QGroundControl.Palette       1.0
 import QGroundControl.Controls      1.0
 import QGroundControl.FlightMap     1.0
 Item {
-readonly property var points: [
-{latitude: 47.3374, longitude: 8.27567}
-]}
+    readonly property var points: [
+        {latitude: 47.3374, longitude: 8.27567}
+        //{latitude: 47.337660, longitude: 8.274703}
+        //{latitude: 47.33662, longitude: 8.285848}
+    ]}
 
 
 
-   /*
+/*
 {latitude: 47.683, longitude: 8.42202},
 {latitude: 47.767, longitude: 8.49575},
 {latitude: 47.6578, longitude: 8.49264},
